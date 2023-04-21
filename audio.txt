@@ -1,0 +1,6907 @@
+I don't know what those letters meant in blue.
+I'm obsessed.
+I don't know what those letters meant in blue.
+I don't know what those letters meant in blue.
+I don't know what those letters meant in blue.
+I don't know what those letters meant in blue.
+I don't know what those letters meant in blue.
+I don't know what those letters meant in blue.
+I don't know what those letters meant in blue.
+I don't know what those letters meant in blue.
+I don't know what those letters meant in blue.
+I don't know what those letters meant in blue.
+I am obsessed.
+I am obsessed.
+I am obsessed.
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+I am obsessed
+Yeah, I think we will
+I think we'll at least explain
+My goal is to explain like
+mental model, way to think about it
+and maybe build a little something
+along the way. No promises it'll look good
+but it should be at least functional
+But yeah
+So I also
+like before we started just wanted to like
+sort of catch up and see how you've been
+doing with all this like
+working with React for the past
+few years. It feels like React Server Components
+has been going
+for a long time or I've heard about it
+for a long time and it's taken many forms
+and I'm kind of curious like what did
+it take to get to this point
+like what was the process
+there and the collaboration
+Yeah
+So I think we first
+started like specifically
+Sebastian
+is like the person who tends
+to
+kind of look at our vision
+going forward like he started thinking
+about this maybe in 2016
+so
+there he had a
+internal document
+called perhaps provocatively
+what comes
+after GraphQL
+and the idea
+was
+basically the architecture
+like the architecture we had
+at Meta for
+like
+for web apps
+was using GraphQL
+and Relay for
+data access and that worked pretty
+well but what ends up
+happening is you
+you push more and more code
+to the client
+and so like the client bundle really
+grows but that's
+also not the whole story it's like
+you also push a lot
+data like the traditional kind
+of rich client architecture
+is you push all the data
+that you might kind of plausibly
+need into a client cache
+and then your components pick parts
+of the data and somehow massage it
+and so what you
+the problem you kind of run into
+you know as you scale it up is
+you end
+up having all the data
+and all the code you might possibly need
+even if actually
+it's not needed for the specific
+case and
+like a canonical
+example of this could be
+you know like when you want
+to show you know a post was
+liked by
+like your friend
+like I don't know
+Dan and like Anna
+and like five others
+something like this and so you don't
+actually need for example
+their avatars
+or
+and like you need like very specific bits
+of information and really like it's just
+you don't even need like the links to their
+profiles it's really
+just the string that you want to get
+but even though the GraphQL
+of course like GraphQL lets you be very selective
+about what you fetch
+and like how you use it so it does
+solve this problem partially
+but you still
+the shape of the data you
+download is dictated by the GraphQL
+endpoint and so if you
+like transform a bunch of
+stuff and
+get you know like get something
+that you know just the
+data for the UI layer you kind of
+have to do it on the client
+and this problem
+it's like an inefficiency problem
+I think that's like one way
+you know one way to think of this is like
+we'd like to optimize it so
+that like the natural way
+to optimize it if you think about it is
+okay like you're on the server anyway
+why not have some kind of
+abstraction kind of like view models
+that used to be like a thing
+in I don't know 20
+2010 or something like this there was
+this idea of like view models that
+massage the actual model from the
+database for the view kind of
+preparing just what the view
+needs
+and I think that's one
+angle and it doesn't
+have to do like I also want to clarify
+it doesn't have to do with like just like big
+pages or anything like
+a classic kind of low
+scale example of this is a documentation
+website where you
+have like you have many
+MDX components
+like you know code
+snippets or interactive code
+editor and so on and
+the way you would do this today
+probably is you just have
+like all of them in a single
+bundle and then like all of them get
+loaded but ideally what you want
+is like if a page has no
+interactive code snippets and also
+only has like static code
+examples you probably don't want to like
+download the parser you kind of want to have
+that output instead
+so I think like that is like
+one part of it is this idea
+like let's not download the data
+we're not going to need let's not
+download the code we might
+not need let's
+just you know download
+the things that we actually do need and then
+if you need to like pre-process a bunch of stuff
+we'll just do that on the server because
+we're going to the server anyway
+why not do it there
+but I think another
+way to look at it is just from the
+mental model perspective
+so if you've been coding
+you know like for a while
+like especially like before
+like before all the client
+stuff explosion
+which you know it was warranted like people
+wanted to do more stuff on the client
+because they wanted to have like
+zero latency
+for like interactions and like really
+reach interactions without reloading the page
+but then if you think in terms of
+like mental model
+kind of thinking in terms of
+like state management and
+caching and like all of this stuff
+it gets really complicated
+like how do you even know like what to
+fetch for the next page how do you
+avoid waterfalls
+like it gets pretty complex and then if you
+think of like the way we used to write
+web apps in you know
+in 2000s before
+like in traditional server
+client model the mental model is
+so much simpler because you just describe
+like I'm going to go to the database
+I'm going to fetch these different things I'm going to spit
+out this response and then
+if you want to like go to another page
+that cycle repeats again
+and so I think like server components
+is you know kind of this idea of
+let's keep the user
+experience where like things
+don't you know you don't reload the page
+all the time but let's
+keep also like the mental model
+of the kind of traditional
+request response
+where you just
+describe what you want to see on the page
+and then it somehow reconciles
+and also like
+let's while we're here why
+not like apply a bunch of optimizations
+now that we know you know like let's not download
+more code than we need let's not
+download more data and so
+in terms of like historical scale
+I think we so we
+started with this
+I think like idea of
+and we knew we also knew that
+you know this approach was also
+not new exactly it was more about
+bringing it to react
+because for
+like we've had
+at Facebook we've had XHP
+so this is
+Wait what is XHP?
+It's sort of like an alternative universe
+and I think we're kind of
+seeing this again with
+you know like when JSX was weird
+to everyone when react came out
+and we didn't even realize that it
+would be controversial
+I think like with server components maybe
+it's a little bit similar because
+the thing we had
+before react
+the way like the
+Facebook website was built
+was with like PHP and later
+changed to hack
+but we have this syntax for
+defining
+components there
+so it was a very different
+mindset from
+I guess dominant solutions like
+Rails or
+you know like the old school
+server solutions
+like in the open source
+XHP was pretty different because it felt
+more like react as in
+you have no like there are no
+additional controllers in
+this kind of MVC sense
+it's more like there's a component
+tree, components can be
+asynchronous so they can like fetch
+some data and then return what they render
+and you can compose them
+and you can have your own components
+and so this is actually like
+where JSX came from
+is like people writing XHP
+code wanted to keep writing
+something similar like on the client
+but the problem with that paradigm is that
+it couldn't refresh
+without like losing the entire page
+and so
+we had this thing as inspiration
+and we also had
+our native apps also kind of worked
+like at least some
+parts of them worked with that model where
+the actual logic for how
+to massage data and like turn it
+into UI tree was on the server
+it was written in XHP
+Is that kind of like PHP?
+I mean I see the similarity
+conceptually of just like you're
+wild-westing your database queries here
+you're turning that into server markup
+and then you're sending it down. It's just there was no
+like server-client relationship yet
+so I kind of see that React like took that
+bit out, the templating was the good part
+let's do the client thing first because that's
+kind of a no-brainer of like yeah that's
+like the end of the spectrum
+that's what you need and now
+we're kind of cycling back
+when we realized oh yeah we probably could
+have a dynamic setup here
+yeah I think it's
+it's just that we already
+had a solution to the server part
+and like XHP was actually
+pretty sophisticated so
+there was another part that was
+related to it called BigPipe
+which we you know like we published
+an article about it in
+2011 maybe
+and it's just
+this idea that if you have
+this kind of like asynchronous
+component abstraction on the server
+you also don't want to
+like hold the entire page
+before starting to
+like emit output
+and I was actually
+surprised like I learned that in
+PHP or Rails like you would
+usually just you know
+fetch everything and kind of then
+start rendering and like that's
+not efficient
+and so yeah
+so the way like BigPipe worked is that
+it had this ability to chunk
+the page like your feed your
+like I don't know like the sidebar
+something else those could be
+parallelized
+so like all of them could have some data
+dependencies but we could stream
+kind of the initial shell and then fill
+them in and so we wanted to bring
+like so I think like we had
+these solutions
+but then we needed client
+interactivity and so React
+kind of started solving that
+and then as we kind of did more
+with React
+there was like this split between
+technologies that became very noticeable
+because they did not really
+integrate well
+no they were used together
+so you could in XHP
+you could render a React component
+but this would only
+work kind of once so this
+would just say you know like
+in this like tree
+when it loads on the client like put
+this React component there but then there
+was no way to update the tree because
+it was just HTML in the end
+so there was no
+way to kind of refresh it without losing
+the page
+okay so there was no
+like client side routing story
+is kind of the big part there
+yeah well it's not just
+routing necessarily it's just there was no
+way to refresh the server
+output without like losing everything
+and so
+I think the
+yeah so I think
+the story kind of
+it really became
+I think like
+the way to explain it
+conceptually
+makes more
+sense like if you do this in a different
+order then things actually happen
+chronologically yeah it does make
+sense because server components are like it's fitting
+this thing that's actually a new starting
+point instead of a new feature
+so it's like if you want to use it
+properly you
+refactor from the top you're not refactoring
+by just let's add a server component right here
+and see how it goes exactly
+yeah and I think it's because
+like we've already like we've had a piece
+you know that works on the server so we did
+the client part and now okay let's
+rethink the server piece
+to work with the client part seamlessly
+because we now know you know the entire
+like how to fit them
+together and so that
+took a long time and I think like suspense
+is especially interesting as a feature
+because the original
+the
+motivation for his design which
+I think was in like 2016 or
+2017 yeah was
+like how do we adopt this
+big pipe architecture like
+this idea of streaming things
+in and like having them kind of appear
+as they're ready like
+how do we fit this into React
+server rendering model
+and so we started there that let
+that let the like design of suspense
+then but the first
+way we shift suspense was actually on the client
+only and it was not supported for
+SSR because we didn't have a streaming
+server render yet and then we did like
+streaming server rendering and then
+we realized actually this still leads
+to waterfalls because like then
+your app lives on the client
+and you need to somehow prevent
+client server waterfalls
+and so then we're like okay maybe we need like
+to actually like do something like
+XFP first or you know like
+do something that actually lets you avoid
+client server waterfalls
+and this idea of like splitting
+components into two types
+was actually using like
+almost the same mechanism as
+Sebastian explored in
+2015 but for
+using Reacting workers
+so it's
+exactly the same idea but applied
+like a different so it's like many things
+came together that were developed
+in like in different years and
+now like we have this consistent vision
+but it's it's a bit hard
+to unpack how it happened exactly
+it yeah and it's
+it's cool to hear the context of like
+where this was born inside
+of Facebook because it starts
+to make a little more sense with that I just know it
+as like an outsider that used
+React first with create React app
+then with Next.js and just kind of learn
+patterns from there for small scale things
+without ever really thinking about the server
+it was like I learned about client stuff
+then I learned about SSR and now
+I'm pushing everything that I can to the server
+it's backwards from how like
+the progress of web
+dev happened like it started with Rails
+and then we started exploring client side
+but I'm like in a generation
+that started with Angular 1 like
+I was middle school before
+that so I just didn't even know what was
+going on in web dev before that
+so it's just different
+yeah I guess the other
+thing that's like relevant is I think a lot
+of people because like the
+word server is so like overloaded
+in like for us at
+least because we
+we try to solve like a more
+general problem so
+like server components for example
+they can run during the
+build right so it doesn't
+mean that you literally need to like have
+a server it's more like
+the server client distinction
+for us is just
+the stuff that runs first and kind of
+the stuff that runs later and so
+the stuff that runs first that could run
+during the build time or
+where actually
+it won't do and it also gets confusing
+right because like client components
+they kind of also run on the server
+during like SSR
+so it's not
+exactly this like client
+stuff is like in the browser server
+stuff is like on the machine
+it's more like just two stages and we need
+some names for the stages
+and we also want to support
+running server components
+on the client
+of course you wouldn't be able to
+read a database but it's just
+using the same mental model
+if you really don't have a server and
+also you don't want to
+you know generate things
+at the build time but you want to structure
+your code like in the same way so that
+it's later possible to like extend
+it or like port it
+so it's really about the paradigm
+of like this you know
+two component types
+rather than specific places where you put
+them
+yeah exactly and I've heard
+the thought in the past
+of like maybe it should have been called use
+interactive or something like that
+where it implies like I'm not a fan of
+that personally but it
+implies that it's adding things
+that could basically
+change state after the fact
+it's not just passing things down through server
+components and it's like
+I get it I think my bigger
+maybe not issue but
+when you hear React server components you think server
+immediately that's definitely a thing
+but it really just means
+thing that doesn't run in the browser
+necessarily usually
+you would do like a static build up front
+and then ship anything down that you can
+or if you want to stream and suspense
+stuff then you can go
+boot up the server and
+Next.js is pretty graceful with that where it's like
+actually figuring out what could
+be sandwiched into a big cache and what
+can't so you don't really have to think about that
+but if you're building it on your own
+I totally agree that server components
+are just like
+pre-rendering I think is one word I've heard
+also like build time versus
+server it could be either one
+so build time components it just
+depends where you're running it
+yeah
+it's confusing I think it's
+one of those cases where everybody has
+suggestions on how to name them but then
+they don't seem
+they all have weird cases
+where it's not exactly true
+and server client is
+like
+maybe this is one of those
+cases where we just
+redefine the terms
+like rendering
+in React rendering
+doesn't mean updating the
+the graphical
+like it's a different concept
+from rendering in graphics
+programming because like in React I
+re-render it doesn't mean that
+a bunch of stuff actually changes on the screen
+it just means we recompute what should
+be on the screen and like maybe we change something
+maybe we don't and so people have
+intuitions like oh I have to avoid re-rendering
+but actually you don't it's
+just a question of like is it actually slow
+if it's not slow you're fine
+like everything is fine and so
+we kind of hijacked this definition
+like in React rendering means
+something different and I feel like maybe
+this is another example of like yeah we kind of
+we need some words to describe
+the relationship and these are the best words
+we found but it's gonna
+be a bit confusing and we haven't
+found any better options so far
+yeah
+it goes all down the stack and
+I work at Astro right now
+and you know maintaining a meta framework
+we were dealing with these really primitive ideas
+where it's like you don't want to use
+complicated names for this stuff you want it
+to feel accessible but
+it also needs to describe what it does
+pretty well I also know
+with React like a big debacle came around
+use as just like a term
+that you can use to unwrap
+something that happens later
+and like I'm getting used
+to it I suggested
+unwrap and people are like well not always
+sometimes use is used for this
+use use that's also
+a thing so it's hard
+you want it to be simple and you want
+it to encompass whatever use
+cases it's actually trying to do
+and yeah I feel like at
+least with server components it strikes a decent
+balance of like you're gonna think about this differently
+it's not running in the client
+yeah I think
+sometimes
+I don't know
+maybe we'll come to regret this but I
+think sometimes you
+you know when people
+talk about oh like I wish this was
+more explicit
+I think one thing we've noticed is that people
+always say that in the beginning
+and then six months later everyone is
+like oh I want like a shortcut I want
+to you know this term is too long or
+it's like API name like I know what
+it is already why do I have to type all
+of this and so we
+kind of I think we discount a little
+bit of this initial knee-jerk reaction
+because we just know yeah you know when
+it's a common thing it's gonna feel different
+like for example with use
+like yeah I just gonna search for react use
+that's gonna be like a top result in Google
+because like we have enough
+like mode to
+you know to actually bubble up
+so I think that helps
+but it's also sometimes
+sometimes you just
+can't have an intuitive term because
+the whole idea is different and
+you might as well kind of
+realize that
+no this doesn't make sense I need to like
+sit down and understand what this is about
+none of my intuitions are
+helping and like that's fine that's
+because it's a new thing it is different
+like it's good if you realize
+that it's different
+yeah I definitely think
+it's signaling that but the
+main thing people are wondering which I'm hoping
+we can get through like with the live
+coding today is like up until
+now I've been able to just
+spin up you know V or something like
+that put a div with an ID of
+main and hydrate a thing
+in there and now we're basically saying
+no there's there's more than that if you
+really want to think about it this way having set
+up my own service for
+a week I can
+say there is more to it and
+I don't know if the react
+team has any opinions on that right now of like
+is DIY server components
+something that's like does it matter
+is it something we need or
+is next.js just the way you should try it
+yeah I think
+so well there's
+a bunch of different things there so
+yeah I think like one thing
+question yeah because like you kind
+of alluded to this thing like I can
+just like have a div and like put something
+in there and so I think that
+was more about not about
+frameworks per se it was about like
+client only versus
+like build time or
+SSR and so I think
+like that's that's one question
+the other question is like
+do you know do it yourself
+set up versus like a
+framework or like should there be one
+framework or many and I think that's that's a separate
+question so which which one
+which one of those do you want to go into
+I'm more interested in the second one I guess
+because the first one I've already
+I pretty much agreed like yeah
+I probably wouldn't point people to
+just feed and react or
+create react app to build something
+I would if you're going to deploy it
+anywhere I'm probably going to point you
+to next.js or astro or
+more likely next.js if you really want to
+try server components
+I think like on the first one my
+perspective is that
+and I mean that that's also
+by you know we know that
+the recommendation change was
+pretty controversial
+but we also didn't try to motivate it
+like we do have like a deep dive there
+that's like can I use react without the framework
+sure yeah I think
+it's a really nice documentation page
+looking through it
+the specific thing I think
+that gets a bit lost is like
+nobody
+is you know it's not
+about like the push
+like the reason we don't suggest
+Vite is
+an option for you know you want to make
+an app fully with react use Vite
+like the reason we don't say this is
+again because like default Vite
+you know when you say Vite you probably
+mean like a template that's blindside
+only because if you use like a template
+that has SSR and a bunch of other
+stuff let's be real it is a framework
+it's not a template
+like it's an ad hoc framework
+that is maybe a good framework but
+if you compare it in terms of usage
+community it's like a very
+niche framework with you know
+a very small community which is maybe
+what you want but let's not fool ourselves
+saying that this isn't
+a framework and then if we talk
+about like a default Vite setup with
+this just like blindside
+only the problem with this is
+it's not that client
+only is bad I don't think that's true
+I think like for some cases it totally makes
+sense it's more
+that you're kind of
+locking yourself into this
+setup it's like let's say like later
+you want to add a landing page
+and you want the landing page
+to have HTML in it and
+because it's like it's silly not
+to like why would you not have
+HTML in a webpage
+it's like it's better for SEO
+sure like crawlers can understand
+JavaScript but like not as fast
+it's like better for
+just like your users you don't have to
+download the bundle to like show anything
+and there are many
+of these like benefits like you
+you don't have like to spin up
+like a separate project with like a static site
+generator you just add a page
+for this page you use
+kind of you know static
+static build whereas for
+another page maybe you like opt
+out and you return like
+just a shell or like even
+null for the server pass
+for the build pass
+then you do client only so it's
+really about like encouraging you to use
+a tool that lets you
+even start with client only
+but then the moment you want to have a page
+or like a part of your
+even enhance existing
+pages
+to be like generated at build time
+or the server features
+you don't have to migrate to another tool
+you don't have to like redo your whole project
+because your router wasn't designed
+for this it's kind of like
+it's also kind of like you used to put
+the router inside
+the you know your react app
+and this is kind of like no the router
+belongs outside
+because if you put the router outside
+then that lets you have like multiple
+pages that are automatically
+code split that have all these like different
+optimization modes
+it's really about like architectural question of pulling it out
+so this is why
+yeah this is why we don't recommend
+the you know even though if you
+want to do client side rendering only
+that's fine but we do recommend
+to do it in a way that lets you
+enhance it with
+build time or server logic later if you
+want to
+which kind of goes back to that point of like server
+components can run in multiple ways
+and you don't want a tool that just locks you
+into one like I've definitely
+had well at least for
+most of the things I build I think this could
+go on serverless if I just had
+one query per RAM I could put this on something
+and it would be way better and I don't
+want to change frameworks to do that I just want to flip
+a switch and this route is now on SSR
+which is something a lot of
+frameworks already do and it's
+something like something like VEET
+which is like a half framework
+it's like a batteries included tool for
+framework authors is how I kind of think
+about it like you can go nuts
+trying to build your own world inside of
+VEET but the default is just like
+sort of showing React on a workbench
+without any opinions of where you put it
+which for like
+Ruby on Rails and stuff like that you're embedding a
+React component in something that's fine and
+I think the docs come out really well of like
+if you have a stack right now here's
+how you can put it in
+as simply as possible wire up Babel
+here you go but yeah
+it lists out any other frameworks that
+put those opinions on top so you
+can deploy it somewhere which is
+what 99% of people are going to do
+even for like a hello world
+yeah and
+then like for your second question
+about you know it should be like
+should there be like a next only thing or
+should there be many frameworks
+or should you like do it yourself
+I think it's still
+an open question of what people will actually
+want to do like I'm not sure
+I think like personally I'd like
+to see many solutions
+I think there's like a
+natural question of like how
+I think there's like a
+tension there with differentiation
+because
+if you're a framework like if you look
+at next app router API
+you'll notice like a lot of
+next APIs are kind of gone
+so it kind of
+feels more vanilla in a weird
+way because it feels like
+well there's no like gets that you know
+there is
+something for like static generation because it can
+it can be handled directly but
+there's no like gets
+server side props it's just async
+await right there's
+you know like there's no like special APIs
+for a bunch of stuff that used
+to have special APIs
+you know exports which is
+like the big thing yeah
+there are I think there are some
+but you know for metadata and a few
+other things that react doesn't handle
+by itself but for
+a bunch of things there isn't and
+you can also compare it to remix I think
+in like you don't render
+an outlet you just accept children
+which is like accepting children is
+the most react
+API possible it's like the most
+vanilla thing and so
+there's this question of like if
+frameworks can and that was
+the goal really with server components
+is to get rid of
+these framework concepts and kind of
+fold them into react in a way that feels
+vanilla and so
+there's a question of like okay if other
+frameworks
+jump on the same train and try
+to do a similar thing there
+is a natural push to kind of
+become more similar to
+next app router maybe there's
+ways to differentiate there like I don't
+know but I think there
+is like tension between
+okay but how do you choose between frameworks then
+if they're kind of
+looking the same because we've
+taken the primitives and like put
+them into react
+so I think that's something
+that remains to be seen
+but if
+you compare it to like do it yourself
+setup I think that's just kind of
+exceedingly hard today and
+it's mostly because server components
+is a very futuristic
+architecture I think maybe we
+undersold like it
+like for the bundling side
+it relies on features that just don't
+exist in bundlers today like
+it has a whole you know like it
+relies on a next generation bundler
+and like a next generation router
+and these things are being
+built right now right like
+we have some like we have
+a backpack plugin that's like not very good
+so some frameworks kind of
+I wrestled it for a while I'm reading
+commit messages from Sebastian like everything
+is experimental like it's
+very very experimental right now
+if you want to DIY I actually got it working in ES
+build because I reverse engineered what
+the bundler is adding and I like
+monkey patched it in which
+like it's a way but I
+agree like what it's doing is fundamentally
+like it looks at each module
+it figures out what it is and then
+adds a lot of information and metadata so
+we can like trace it back putting the client
+components where they're supposed to go
+and to set that all up yourself it's not as
+simple as just like webpack
+target JSX files react
+plugin like there's
+more to it yeah
+I wouldn't say that the like I'd say
+the bundler I think like
+one thing I
+I feel a bit
+I think sometimes people
+say oh it's so complicated
+and I think if you really look at the ideas
+the ideas are very simple it's just
+that implementing them is complicated
+because the tools were not designed for
+these ideas so
+if you think of the bundler integration
+it's really about
+supporting this use client directive
+like that's a feature
+with like one line
+API it's not you know
+it's not something that's like super
+it's not some Java monstrosity right
+it's a very simple idea
+but the bundlers
+like the today's generation
+of bundlers was not designed
+for this kind of feature
+because it's like fundamentally different
+it's on a similar scope
+as you know if you went
+back in time to like 2007
+and was
+trying to explain code splitting
+to somebody who uses
+if you
+I don't know if you remember there was like require.js
+which was like a bundler
+that people used at the time
+and I think like it didn't support
+I don't think it supported code splitting
+it was kind of loaded
+like the optimizing bundler would put everything
+into the same file
+but it's a similar feature to like dynamic import
+that lets you do code splitting
+except it's like a different kind of
+code splitting that splits apart
+like the client parts
+from the server parts
+and so an ideal bundler would
+treat all of this
+as a single you know as a built in feature
+and be able to
+kind of process the
+server tree and the client tree as like a
+single pass with multiple
+bundle outputs for different
+targets and that's not something
+that bundlers are great at today so
+we can try to add it as plugins which is what
+we've been doing but really ideally
+you would redesign a bundler
+around this idea and I think
+you know TurboPack is like
+one you know implementation
+that currently treats it as a first class feature
+and I think with time
+other bundlers will and like I know
+Devon from Parcel is also working on this
+and I think with time we'll see
+this feature adopted more broadly
+and then I think we'll see
+other libraries now that the feature
+is in the bundlers I think we'll see
+maybe Vue or
+Svelte or others taking advantage
+of that in like implementing similar
+architectures on top of those features
+yeah I actually
+saw a stream yesterday with Evan Yu
+who hopped on with Theo to talk
+about what they're doing with Vite and Vue
+and all of that and one part of that
+discussion was Vapor which I believe
+is like an early exploration of like what
+could server stuff look like in
+Vue and it doesn't mean Vaporware by the way
+I'm hoping it doesn't anyways
+but it's definitely
+spreading right now and
+if the creator of Vite is exploring
+it that could mean it sort of
+you know spreads out to anyone else
+who's using Vite which as far as I know
+is most frameworks that aren't Next.js
+or Remix even Remix is
+trying Vite as far as I know
+so TurboPack for me is like a
+wait and see I'm very curious about it
+because I got to speak with Jared
+a little bit in person
+and it's definitely about like
+build caching being very
+focused on you know compiling
+everything down to the very function
+that you're trying to get and doing it
+efficiently so I think
+there will be sort of two competing
+threads of like Vite is using
+all the tech we have today and
+TurboPack is kind of adapting Webpack
+into something that could work
+better tomorrow
+I think TurboPack is
+TurboPack is a completely new
+codebase right it's not related to
+Webpack so it's a rethinking
+of
+yeah it's complicated
+because I heard the talk that said this is the
+successor to Webpack even though it's
+entirely different as far as
+I can tell like I don't think it uses the same
+config or conventions but
+I haven't tried to use any of it yet
+yeah I think it's successor just in the sense
+that like Tobias
+is working it so it's like
+what did Tobias learn
+from like I don't
+know how many years of Webpack
+and
+yeah how do you design it again
+now that you know all these lessons
+which is kind of similar but you know with like
+server components that's kind of what we've
+seen and
+I want actually to mention because
+you know you were asking about the history and like
+influences and for server
+components it's really many
+it's like it's our old
+XHP stuff it's our
+native stack that you know
+works let's just do native
+apps but driven by server
+server driven UI
+it's really so a lot of
+a lot of contributions to server
+components model came from Relay
+and Joe Savona and
+you know people on the Relay team
+it was early exploration
+like some of the earliest
+design drafts were collaboration
+with the Chrome team
+and with
+the Next.js team
+so Next.js was kind of
+because like get initial props was one
+of the inspirations for this kind of API
+so
+that like we were kind of
+like talking about it with Next.js team a long
+time ago and so it's really
+it's unifying many
+many branches and there's
+a lot you know there's a lot that we were
+inspired by while working
+on it. Yeah
+and I kind of let that GraphQL point drop
+earlier but it's a really
+I never made that parallel but it makes
+sense of like it has that same
+goal of only send data to the
+client that is necessary
+in order to render what's on the page
+and today like if you want to render
+anything you can optimize your
+API as hard as you can to make sure
+it only sends the data that you want
+but people kind of realize GraphQL is hard
+to set up sometimes it's too heavy weight
+so if there was a way that basically filters
+it out for you where you're writing
+your own back end to grab that data
+and just hydrate the little pieces you want down
+the chain like that's oddly
+a successor to that idea
+of like making sure all
+the data you send down is actually lightweight
+and I'm curious if we'll ever
+end up with dev tools around I'm sure we will
+end up with dev tools around that but
+it's something I've never really thought about is like
+how big are my props like I'm probably
+sending a ton of props right now and I have no idea
+what it is and the easiest thing
+is to just send all the props
+but if there was a way to debug like
+your props bundle is like 10 kilobytes
+of JSON are you sure you wanted to do that
+like I think that would really make
+server components start to make even more sense
+yeah it's
+pretty tricky
+I think like the whole
+kind of monitoring story
+like the other piece
+of the puzzle there is
+you don't really have much
+like you don't have a network timeline
+for the server which
+I think makes people anxious like
+oh is it going to have so many waterfalls
+and like you can have waterfalls
+you know with something like Remix too
+like it's actually pretty trivial
+to have one
+but it's not obvious like
+I think if we had better tooling
+for just visualizing
+what actually happens on the server
+how did your requests get processed
+I think that would ease a lot of this anxiety
+and it would also be useful
+for other frameworks like it's not
+server component specific
+so I think like we need a lot more
+like I think the
+kind of the optimizations and developer
+experience would get like
+a lot better when we have better
+observability into
+what happens on the server
+and what crosses the boundary
+yeah and like what is contributing
+to that like which components have
+really like
+you know a lot of output and then
+you're like okay let's make this one client
+component and then increases
+the bundle size a bit but then we don't have to send
+the stuff it generates
+on like every navigation
+but that's also the beauty of this paradigm is you can
+you know you can flip it back and forth
+you can flip it back and forth
+yeah I remember for that space I was like
+that's the one thing Astro doesn't do very well
+because it's like you use styling
+or you can do styling differently which can get
+in the way I also do want to shout out
+Joshua who rated and
+apparently works at Code Academy as well
+he was chiming in a bit
+oh I tried to shout out but it said it doesn't exist
+sorry go follow Joshua everyone
+but he was saying like
+yeah definitely run into the
+big props bundle at Code Academy
+of like the slowdowns were really just
+slamming a bunch of data down the pipe that
+didn't need to be and it was just delaying
+the amount because it had to
+get initial props which was a lot
+and then hydrate it all onto the page
+and there was no way to sort of
+introspect that like
+because you're on the client you're not really introspecting
+what your server is doing
+when you're on that boundary
+yeah so the other thing that maybe
+is not obvious but you know when I
+talk about server components
+also including like
+10 years of hard thinking about
+optimizations it's also stuff like this
+so like with server components
+you don't actually have
+this kind of waterfall
+where like in
+traditional server rendered
+React frameworks including
+Next.js you would have this
+you have to download all the code
+then like
+enough to hydrate your page
+like the main chunk
+you have to get all the data
+like inlined into HTML
+and only then you can start hydrating
+so server components doesn't work like this
+in server components you only need
+like enough to
+get the initial shell
+to hydrate so actually
+your components
+your client component chunks
+they're loaded asynchronously
+and so React can start hydrating
+before all the data arrives
+before all the code arrives
+we actually want to start as early as possible
+and then we kind of
+make a tree interactive
+as like chunks of code
+chunks of data
+streaming, they're like separated
+if you see like how Next
+kind of generates the stuff
+it emits separate script tags
+that add a little bit more data
+as it becomes available
+and we update the UI
+as it becomes available
+even before React actually loads
+we're able to update the UI to progressively show
+more output from the server
+it's all designed to be very
+incremental so that you don't
+have these things where you have to do
+the whole pass
+of one thing and then the whole pass
+of another thing it's like you do small bits
+here and there so it progressively
+becomes more and more interactive
+yeah exactly
+and I think that's a good segue into
+a little bit of code that I have to
+demo that's outside of Next.js
+so
+it looks like you can still see my live share
+but I'll start
+by giving a little context on
+what we might try to build today
+it's meant to have multiple
+steps so if we don't get to all of them
+we at least have something at the end of the day
+but let me also
+screen share for the lovelies out there
+guest screen share, cool
+so
+this is just a basic mockup
+that I put together of something you might
+try to build when you're building
+an application. I called it
+abramix as a pun on abramov
+I tried, I really tried here
+sorry about that
+well thank you
+but this is like a basic song
+interface you might have where
+you just have a readout of all of your albums
+you might have a search bar that filters
+which albums are showing on the page
+and I'd love to talk about how would you
+do search, where would you do that logic
+client versus server since
+I've wondered that a lot
+and maybe you
+have individual routes for every album
+where you click into one, it goes to
+slash album name and then it shows you
+more information and that can be
+client side routing
+we use Next.js for that
+I think it's a pretty clear
+upgrade journey
+but as a workbench
+to try that out I have
+a server running over here
+on what I called simple
+RSC which is a
+repo that people can go try out now
+if they want to, it only runs on node
+version 18.13
+because I'm bad at testing things before I
+deploy, but if you want to
+try it out, it's just a node
+server that builds
+some React components using esbuild
+and lets you see
+a single route on the page, there's no
+routing, there's no opinions around really
+anything, all that's coded into this
+is a way to write a server component
+and a debugging view
+at the bottom of the page that shows
+you all of the stuff that is
+coming down from the server as the page
+is rendering in real time
+and you can see a basic example
+of that off to the right
+where we have our server
+component over here in our editor
+there's some stale imports that we're not using
+right now, but all this is doing
+is it's creating a server component
+it's rendering an h1 saying
+welcome to server components
+oh is the repo still private, oh dang
+thank you for the call out
+let me
+make my screen share and change it to public
+so I don't dox myself
+and then I will show it again
+if I go to settings
+change visibility, change to public
+I want to make this repository
+public, please please
+please, I have to send an
+SMS to myself to make it public
+oh my god
+there's three dialogues
+and a text message, that's crazy
+605
+043
+okay, now
+it should be public, if anyone wants to
+click on that link
+you can go try it out
+and now I have to go back
+to code, hold that up
+and send in the chat
+alright
+but yeah, I heard your opinions
+earlier of like, you're probably not going to
+do this to do anything production ready
+which is why I only set this up with the dev
+server, I only set it up with
+a panel of everything
+that's going on, and there's no way
+to actually deploy this to production right now
+because that's not really the intended use case
+but yeah, off to
+the right is the most user-friendly
+feed that I could create
+and it is literally
+showing you all of the stuff that is coming down the
+wire when you stream something
+so here, what we're rendering on the page
+is just some instructions
+as I would call them, from the server
+to go make some JSX DOM elements
+and then append them to the page
+as we're seeing here, and there's no
+hydration or server rendering going on, it's just like
+a client that fetches a server
+component and shows it to you
+yeah, first
+do you have any initial questions on
+this setup and everything that I have going on
+because there is a lot under the hood
+are you asking
+me or the viewers?
+a little bit, just to
+slow down for a second
+no, no, I'm saying, is it a question
+to me, do I have questions, or are you
+asking somebody?
+yeah, maybe one thing
+I'm not sure about
+is
+how did you get the build setup?
+you said you did your own
+bundle plugin
+yes, I did
+so, the build
+is actually pretty interesting
+it's inside of this handler.js
+file, and this is going
+right in the weeds, but I don't really mind it
+where
+I set up a simple
+request response handler, that's all this is
+it just takes in a web standard request
+sends a response, and
+in order to get the server
+I set it up to import
+a built server
+and the bundle map is
+something that's generated separately, as it
+crawls through the page, it discovers client
+components, and puts them into this map
+that it's able to match up at the end of the day
+that gets into client components
+which I guess we'll explore in a moment
+but that's all it really
+does for that, the more interesting
+file, actually I just remembered
+that I moved the build step out
+over here
+I can jump over here, but this
+is using esbuild to do everything
+so not necessarily plugins, but
+it's got a two step
+build process right now
+where it looks for that server component
+and it will output it
+just using a JSX transform
+it's not going to resolve any modules or anything
+it's literally just going to output it
+with the JSX transform, leave everything else alone
+and the one weird piece
+is this part right here
+anyone watching at home, don't do
+this, but I am reading
+the file, whenever it discovers
+a client component, I'm checking for
+the use client directive
+and I'm doing this wild line
+right here that
+inserts a few things that Webpack
+looks for in order to decide if something
+is a client component
+so it imports it inline
+it tells it that it's a client
+reference, and then it returns
+that in order to import onto the page
+and I figured out
+it works! It's not using Webpack
+and it still does technically work
+but that's an under the hood view
+I'm sure you don't have
+pleasant opinions about it, but
+it works
+I think I don't fully understand
+the handler part
+this runs
+what is the
+oh sure
+why is there a
+path, oh so this is the thing
+you fetch, right?
+this is the thing you fetch
+yeah, so this is
+the server components endpoint
+so to speak
+yeah, and I could have
+it's a bit confusing because
+it looks like I'm
+fetching JSX and I'm like
+what is this about?
+I named it that thinking that's how it worked
+and realized that's not what I'm doing
+I'm actually sending you the stream
+I'm not sending you the file
+this is kind of more like
+like RSC or
+yeah
+it's just like an API
+it's like a
+GraphQL endpoint I think, except
+instead of GraphQL it's like
+React
+okay, now that makes sense, I get it
+yep, I should have explained that part
+because I realized after the fact that's not
+what it is, and I also looked through
+some of the React docs and
+the content type of what this sends down is
+like X component is
+one way to put it, it's special
+it's something that React understands
+is the way that I would put it
+yeah, okay
+that sounds good
+yeah, I don't
+think I have any more questions
+so we can
+maybe try to do something
+I do want to clarify
+though for people watching that
+if I understood correctly what you're saying
+like, the architecture here essentially
+is that the browser
+will load like an empty HTML shell
+which is kind of like
+a traditional CRA app actually
+like a web app
+it loads empty HTML
+then requests the
+server component endpoint
+and server component streams in
+you know, what the server output is
+so it's not super efficient because
+it has this client-server waterfall
+for the first load
+whereas a proper setup would
+actually do SSR as well
+so it would
+do that on the server instead
+like when it hits index.html
+it would
+actually talk to the RSC endpoint
+on the server
+load that HTML, stream the HTML
+to the client, and that's how the
+initial page would be
+actually have content without
+an extra waterfall
+but this is much harder to do
+manually, and there's already enough
+of manual setup, so this is just
+the simplified version
+yeah, and that's the callout
+that's definitely worth making
+because I'll admit, I tried, but I realized
+doing that without blocking
+on suspense boundaries
+and not just reading the whole stream
+I was like, I can't, I don't know
+what I'm supposed to do here, I know
+Next.js knows, they figured it out
+but yeah, it's a different
+problem
+it's doable, like we actually have
+an example in the React repo
+so we go to fixtures slash
+flight, it has like a super
+believe me, I've had
+every page visited at this point
+yeah, so it shows
+how to do it, but it is confusing
+it's a lot
+oh yeah, for a client
+emulator, this is the page that
+I was reading for a little bit
+I don't actually see
+because I think you're sharing just the part of the screen
+so I don't know
+I shared an individual tab
+which means I would have to visit it in this
+tab, and then it would work
+it also
+might be delayed
+yeah
+this is the weird part, and this
+definitely speaks to what you said about client
+isn't really browser
+client is just whoever wants to consume
+that server component, and it could
+be the server itself in order to render it
+to HTML, or it could be the client
+when you're trying to do client-side routing
+which is usually what you'd end up with
+here, like yeah, the initial load
+of, now I have to hit back
+the initial load of this
+that's not good, you want to have the server rendered
+but if I want to load this as
+another route coming in, then
+it actually makes sense, I actually want to get this
+full stream and just render it onto the page
+of JavaScript
+yeah, I think another thing that's
+worth highlighting maybe is
+I think
+sometimes people have this
+wrong mental model of
+when you have a server component in the tree
+you go to the server, and it's
+like each individual server component
+is kind of rendered independently
+but it's really not like this
+it's more like
+it's just, there's
+I think in a simple setup, like
+the one you have, the only
+server component that you talk
+to or render is the
+top-level one, so it's really about
+top-down rendering
+the whole page, and if you
+refetch, it's going to go to the
+server component
+server and re-render the
+app, the top-level thing
+and get the new output for that
+and then that's of course not super
+efficient, so this is why with something
+like Next.js, you have nested routing
+where the granularity
+is to the
+sub-route level
+so you can't update
+one small server component
+that doesn't make sense in the model, because they
+all have to be consistent
+with each other, but what you can do
+is you can invalidate the sub-route
+so that would be like, for example, if you have
+a shell of the page, and then they have
+some kind of tab interface
+like about, photos,
+memories, whatever,
+then when you switch those things,
+it's just this part that
+gets independently refetched
+from the server, but if you want
+to refetch something
+broader, like you want to change
+there's a mutation that affected something
+else on the screen, you just refetch
+the whole thing, and this might sound like
+oh, this is going to be super slow, but let's remember
+that this is literally what happens if the
+user just opens the page and
+opens the tab, so it's not
+that different from
+traditional web models.
+Yeah, it's not.
+And that is a real big thing of like
+routes aren't necessarily
+full routes, they're layers of an
+onion or individual components
+that you can just slot into view
+like this server component that we've created
+here, this could be fetched from
+some other route on the page, and it could just add
+welcome to server components below
+a navigation bar and other things
+that are being rendered. It's just a way to
+officially fetch server stuff.
+Yeah, but then for that you kind of
+need a framework because
+implementing this kind of nested thing
+in this demo, that's yet
+another level of complexity, and that's why
+DIY is
+actually really hard today because you just
+don't have a router like this
+that's, you know, there is no RSC
+router you can use off the shelf.
+But you can build one.
+You can write one.
+I'm not going to invite myself to do that.
+I've already sunk too much time into this.
+But yeah, that's
+why I guess the main goal of this project
+was like, I just want a way to workbench
+one server component and have a
+dev panel of the stuff coming down the pipe.
+And that's it. Like, no opinions
+on routing because, as you kind of mentioned,
+React is
+I don't know if you said this yet, but React
+is more of an architecture
+and a library than it is a
+framework. And in
+order to have any opinions about, like, where
+do the routes go? What is the
+nesting strategies that you probably
+want? Like, that's immediately framework
+opinions. And that's already taking
+things to a new space.
+Yeah.
+Yeah.
+So with this, I'm thinking
+like, maybe we can put some albums
+on the page and render them out to start.
+I have some
+really basic endpoints here.
+And this is literally just
+fetching some JSON. And I say
+fetch, it's just an
+import with an artificial
+wait time to make it feel like it's a server
+but it's not. It was just
+the easiest way.
+Where should that be looking? I'm not sure.
+Sorry. Right.
+I was just looking at this DB fetch file.
+Oh, okay.
+This part isn't too important
+but I just made some JSON dumps
+of good albums that I
+like. That's why I actually mentioned
+earlier, like, if you want to put an album on here, we can.
+Because you put out those really
+good tweets of just, like, a random song on Spotify.
+Like, this is great. Like, you know
+what, you're right. It's really good.
+But yeah, that's all this is
+doing. I have a get all, which will
+wait 300 milliseconds and send you all the
+albums. And get by ID, where
+you can pass in an individual ID
+slug, whatever you want. So if you
+want to do routing, that's how you would get, like,
+an individual entry.
+But yeah.
+I hopped back over here. I think I have to
+keep, like, focusing you to bring you
+into the model. Yeah, yeah.
+We're trying VS Code live share, by the way.
+So
+we'll see how it goes.
+Anything goes
+is the idea here. If we want to jump
+in and type code, either one of us can do it.
+But yeah.
+In order to render all of the albums
+onto the page,
+well, I've already kind of done it.
+I kind of spoiled it.
+Where in a server company, you can just
+say, wait, get all the albums,
+and then to put them on the page, I guess we could just
+do a map over whatever's
+going on.
+There's one thing I asked about earlier
+where I was wondering
+why you would need an
+ID prop or a key. That's what
+I'm thinking of.
+Because that's always been the thing with React
+Lists that I forget.
+Which is adding a key onto every entry.
+So is that still
+required? And if so,
+what is sort of the benefit to that?
+Yeah, so maybe
+I think to answer that question,
+do you know why it's required?
+If we put server components out of the
+story, do you know why it's required on the client?
+Yeah, I know why it's required
+on the client. Usually for
+if the list updates
+and you need things to
+reorient and you want it to re-render
+efficiently, then a key will actually tell
+React, this is the part that was removed.
+This is the part that got moved up.
+So if you want to animate that transition
+of the
+item with a key of 4 moved
+from this position to this position,
+React can track, oh, that's
+the thing with the key of 4. I know how to animate
+that up if you're using some external
+library for it. Is that kind of right?
+I know there's more reasons.
+Sort of. I think maybe the focus
+on efficiency is a mistake.
+I think we've kind of maybe explained
+it badly in the old docs where
+we explain it as, oh, if
+you want it to be fast, then you should use
+a key. It has nothing to do with being
+fast.
+Yeah, not fast.
+Just to do it at all.
+If you want to do it in transition.
+Well, I don't think it has to do with animations
+either. It's
+really
+about
+kind of identity
+across re-renders.
+So it's
+about state. And I don't mean just
+React state. I mean even
+input state.
+If you just render an input
+that's uncontrolled
+or focus or
+scroll position or any
+of the things that are kind of
+stateful,
+it's about
+like imagine you render
+a list of components
+and then each of those components has
+an input inside. And again,
+this input doesn't have to be
+controlled value
+proper or anything like this. It could just be
+browser input, React doesn't touch it.
+You could do whatever with it.
+And so you type into each of those
+inputs and then suppose
+the first item in the
+list was deleted. And so
+there's a re-render and
+React now sees that
+there's the
+item, like you're
+rendering two items instead
+of three. The first one is gone.
+And so if you don't provide the key,
+React has no idea which of
+these items correspond.
+How do the old items kind of
+match to the new ones?
+Because it could be like this.
+But it could be like this.
+So it can't
+know which one was deleted
+because it
+just doesn't have the knowledge.
+And so if you get
+it wrong, so if it just tries to
+for example, it just matches up
+like this.
+And that's the default.
+It goes in the direction.
+This is the first one, used to be here,
+now it's here. This is the second one, used to be here,
+now it's here.
+So the inputs
+will be preserved.
+And so if what
+actually happened is this,
+so the first item got deleted,
+then you're going to see
+wrong inputs at wrong positions.
+And that is really the issue.
+If you've already modified them,
+but then things shifted, you're just
+going to see
+it's kind of the same.
+Imagine you're in a bus
+and there's like
+20 people in the bus and
+everybody has
+a seat.
+And you leave
+some stuff on your seat. Maybe you leave your
+headphones on the seat. I've done that once
+and they disappeared.
+And so imagine
+the situation.
+You leave the bus.
+When you come back to the bus,
+you want to go to your seat, even
+if there's fewer people. Even if some people
+got off the bus, you want to remember which
+seat is yours. You don't want to
+sit somewhere else. And so what happens
+if you don't specify a key,
+it's like you don't know what
+your seat is.
+So by
+default, you're going to be seated in
+the order.
+That's kind of the default for the key. It's just like index.
+So it's like the first people who gets
+on the bus goes to the first seat.
+The second person
+goes to the second seat and so on.
+And so if one of the people has
+left, then everybody
+else will get the wrong seat because
+the order has shifted. And that's why
+you need keys.
+And so it's the same with
+server components. You don't notice it all the time.
+But I've definitely run into
+why can't you just use the index
+in the array? It's like, well, if you do that,
+you actually get a clearer idea of why
+keys are bad or why
+you need a key. Where if you remove
+the first item in the list, now
+all of a sudden, item 0 became 1,
+item 1 became 2, item 2 became
+3. So it's like they're all different people
+now. It's like everyone on the bus
+traded seats all of a sudden
+when that actually didn't need to happen.
+And you don't always notice it.
+But with efficient libraries, it's like you do.
+Yeah, so this is very interesting
+because you don't always notice it.
+And like one
+way to notice it is, yes, animations,
+because they make it obvious that, wait,
+a thing disappearing is a
+very different thing from, you know, things
+reordering and updating.
+But another way to notice
+it is, and that is
+the most insidious thing, it's like
+initially you don't add a key because
+it seems to work fine. And then
+like five months later,
+somebody adds a little bit piece
+of state somewhere deep down
+in the item components,
+like even like five levels down.
+And this piece
+of state will get misplaced when they
+reorder because you didn't give the right key
+to the top level thing.
+So it's like if everybody leaves the bus
+but nobody has headphones on the seat,
+the seats kind of don't matter.
+It's okay to sit anywhere. But if
+you start leaving your valuables,
+now it becomes
+important. So that's why, and sometimes
+index as a key is fine
+when that actually corresponds to
+the identity. So it's like
+literally it's important, you know, the first thing
+is the first thing, the second thing is the second.
+That's what, you know, like a list of
+words in a sentence or something
+like this, or like the first line
+of code, the second line of code.
+Then it kind of makes sense that, yeah, the index
+is actually the identity
+of that thing. It makes sense that
+the, you know, so.
+Yeah, I agree.
+But I'll say specifically
+the server components part of this is
+it's important for server components too
+because server component output can
+be refreshed. So if you have
+for example like a refresh
+button that will
+cause, you know, the server component output
+to update, maybe you deleted
+that album from the database and they're all
+going to like shift by one. And so this
+is again why you want to have a key.
+Yeah, that's the
+part that I like, I don't know what it looks like
+because I've only played with server components
+in a read only model
+where it's like I funnel all my data down
+it renders on the page and
+any mutations beyond that are
+handled with client. And
+it sounds like there are ways
+with server components to like sort of
+refresh, refetch
+like the same fragment of components
+and actually have it re-render
+like server only search or something like that.
+Yeah, that's exactly the
+point. Like you're not supposed to be
+copying, you know, props
+from the server into state and then like
+updating that state. Like the
+whole point is not to have to do that
+and to just be like something changed
+just like you refresh
+an API call except here you refresh
+the output.
+Yeah, exactly. And I do
+want to try that. We might have to move to Next.js
+to try it, I have no idea.
+But we'll just see.
+But I think that also speaks to like what
+we're getting over here.
+So what I did is
+I just rendered out the album titles
+as list items and
+the immediate thing that
+you sort of notice in that dev panel
+at the bottom is
+it's not passing down the entire
+list of albums. It's only passing
+down a set of like instructions
+to like write out
+the name with the ID and that's
+it. Like there's no images in here,
+there's no albums that we weren't
+searching for. Well, I guess we're getting all of them.
+But there's also a big list of songs
+that could have been sent down the wire.
+But because we're doing all these
+instructions on the server, it's only
+going to send this. We basically wrote our own
+GraphQL query in a way of like
+get album and just the title
+field and then render that
+into something.
+Yeah, I would maybe slightly reframe
+what you're saying instructions
+and it's kind of correct in a way
+but it is a bit
+I think like there's a way to misinterpret it
+where you think the server is kind of sending
+commands whereas
+the mental model is more like
+the server just sends a response
+that's essentially
+you can think of this response
+as it's almost like JSON.
+So it's almost like a big
+JSON tree that
+includes your
+kind of your HTML
+components, like your React
+components, you know like things like
+native and so on except
+formatted as JSON
+kind of like the virtual DOM
+as well as like if you have client components
+it will send also render
+this like like button with these
+props and so these props are also
+going to be kind of like JSON, right?
+So you can imagine the response as
+just like big JSON object
+except that would not be efficient because then
+you would have to wait for that entire
+object before you can like start
+rendering it properly
+Our protocol is just
+a thing that splits this JSON into
+parts. It's like JSON
+with holes. So it says like here's
+a hole that's going to be filled in later
+and so they're sent as
+they become available it sends more
+and more. But conceptually it's more
+like you know
+filling in the remaining content. It's
+not so much like it's not imperative
+as like do this then do this.
+It's just filling in the parts as
+they become available.
+Yep. Yeah I kind of say instructions
+where it's like React is going to
+take this blob and convert it
+to JSX which becomes
+actual like DOM queries to
+render stuff on the page. But
+I agree it's like
+it's not just the data
+it's the HTML
+in a different shape. It's actually
+filtering out what needs to be rendered
+based on well what are you trying to
+render? Like you're not going to use
+we're not going to send the album image down the pipe
+because you didn't render an image. You never
+accessed it. So it's not sending
+down like the album object. It's sending down
+the values that have been
+put in there.
+I'm curious. Do you want to
+kind of
+show what happens if
+we
+if we kind of split it into the components
+so that you can
+delay. So you can send. Okay
+yeah let's do that.
+Let's see it.
+I mean I can type
+it out since I think all we have to do is this.
+So now I'm going to make
+a separate albums call and
+Perdo's curious like
+you know a wait is always going to be
+a blocking thing. It's not going to send
+this until this is done.
+So if you wanted to
+you know delay that or control
+when this runs you can move the query
+somewhere else or even pass down the promise
+as a prop which is something that I've
+seen the experiments with.
+And in here I'm going
+to just pass down the list
+without the other stuff.
+And do you want me
+to put a suspense around this or just put
+albums. Let's maybe start
+with just albums and then we'll add
+suspense and see how it changes
+things. Okay. Oh it's
+thinking that's the thing.
+There we go.
+Too helpful.
+And don't worry about the
+squiggle. That's just because
+it doesn't know about async being a thing.
+I know that's like a patch you can
+make in next JS.
+But yeah what we get here.
+I think you want to get rid of this line too right.
+Oh you're totally right.
+Yeah.
+Okay that's better.
+So now yeah everything comes down in
+one chunk it looks like.
+And this isn't split perfectly.
+This was supposed to split out like this
+part from this part. I'm still trying to figure out how
+to parse it because sometimes things come so
+quickly it's like part of the same message.
+But generally
+what you're going to get is like you're going to get
+the welcome to server components and then
+immediately you're going to get
+the next chunk and
+you're going to load in tandem.
+Yeah so what I want to call attention to
+can I
+like yeah.
+So what I want to call attention to is like this
+protocol that you're showing in the dev panel
+like that's an implementation detail
+so it's not actually something you're supposed to
+be able to like read or care about
+except for I don't know maybe some kind of debugging
+but mostly if you're debugging
+React like if you're working on React yes
+that's useful but it's not something we want
+you to kind of think about and it's going to change
+over time it's not you know it's not
+super optimized yet.
+But if we're
+using it as an instructional tool
+you know to kind of teach how this works
+I think it's interesting to notice
+yeah I see your formatting
+is a bit messed up because you see it says
+0 colon blah blah
+blah and then it says 1 colon blah blah
+blah I think those were supposed to be separate
+lines because like in the response
+there are separate lines
+but I want you to notice how it's
+structured like do you notice
+it's like
+0 is like the first line
+and it says at 1
+and I don't remember the exact syntax again
+that's not the point but it kind of references
+like this is a hole it says like
+the result of 0 is
+going to be streamed under
+number 1 and then you see like number
+1 says you need
+to have like a header with
+welcome to server components
+and then the rest is going to be streamed under
+number 2 you see it says like
+L2 is like I don't remember
+what L means but it says
+that that's going to be coming later and then
+2 is like the remaining response
+and so these are these like
+that's the key thing that makes it possible
+to stream parts because we just leave
+holes and we're like yeah this thing
+number 42 is going to be filled in later
+and then we're able to like stream
+that part
+yep and yeah I agree
+like you're not going to be looking at this
+I didn't really care about the formatting so much
+as like what data is coming down
+and what's the order
+like this data came down a second later
+why and
+yeah the dev tools are split up by like
+the order to stream comes in
+and I don't split it up by these like numbers
+but that's the indicator
+that's where the holes are which is probably what you're looking
+for if you're thinking like
+first bit is this second bit is this
+and you can see like 2 matches up with 2
+and all that stuff
+maybe if I add the
+pre wrap
+or whatever the CSS thing to preserve
+new lines maybe then it will
+split 0 and 1 because
+0 and 1 are I think they arrive
+in the same response chunk
+but they are like separate lines
+they're separate things
+but it doesn't matter
+it doesn't matter
+and sometimes changes where it's like
+I decided this chunk should load with
+the next one and sometimes it's like no it's more
+efficient to put it up here so there's some
+optimization going on but
+in this example am I right
+that at least as
+the user sees it you're going
+to see all of this stuff coming in
+at once like you're not
+going to see like one then the next
+exactly
+and the idea here is
+the way you structure
+your
+the way you decide
+which components do what kind of data
+fetching and like moving
+data fetching calls between them should not
+affect the visual output for
+the user because
+I think that is like
+there's a bunch of things we've learned that
+we haven't communicated super well
+but I think like this is one of them
+like you want to have the freedom to move
+the data fetching code around
+without any effect on the
+user experience or like the way
+the user perceives it and then
+you want the people who are not necessarily
+super skilled
+in like how data fetching
+works like you know like a designer
+to be able to
+say I want like this piece
+of JSX to have its own
+loading indicator
+like its own skeleton
+and to be able to do that completely
+declaratively just by
+you know putting it into JSX
+tree without worrying about
+how you know how it's
+how it's actually kind of streamed
+in so the
+way the loading the progression
+the loading sequence that
+the user sees
+like the visual loading sequence
+is completely decoupled
+from you know the
+the streaming sequence because
+for streaming we want to stream as
+much as we can as early as we
+can as we discover things
+but then you know to the user we
+want to present them like each visual state
+should be intentional and only
+correspond to what the user actually wants to see
+Yeah and definitely
+seeing that here and I know that
+as you sort of cascade down
+multiple fetch calls it's
+really just going to wait for everything before
+going to the user if you aren't suspending
+if you aren't doing anything like that
+it's just going to bunch up all of those requests
+and you can do a promise.all at the top
+level if you really want to be smart
+about like parallelizing each fetch
+but that's exactly what
+we're seeing here of like even though it's in the second
+one it's all going to come down in one
+big chunk and I alluded
+to how you could avoid that
+but well okay I say avoid
+as if it's a bad thing this is actually
+the behavior you probably do want
+but if there is
+like behavior
+when would you say like
+is a good use case for
+wrapping something in a suspense boundary
+it's probably pretty nuanced but
+I'm curious if you have thoughts about
+like where you found it. Yeah I would just say
+like if it feels slow
+because you have a slow data source
+or there's
+a lot of logic that needs to be downloaded
+it's like suspense also
+works for client
+like it's integrated with everything
+right like we're going to integrate it with CSS
+we're already integrating it with images
+so it's already
+integrated with code it's like if you
+render a like button component
+it's a client component and the suspense
+is going to wait automatically
+for that client code
+to load even if it's code split
+like it is code split by
+default like if you import a client
+component from a server component
+it's like there is no
+need to do code splitting it's just code splitting
+is how it works and so it's
+going to wait for that
+code and any data and
+in the future like CSS or images
+to be ready and then
+it flips you know it makes it visible when like
+all the things in that tree resolve
+so I think pragmatically speaking
+it's just you have something that loads
+that takes a bit of time you don't know why
+it takes a bit of time but actually it doesn't matter
+you just wrap it in suspense
+and that kind of lets you unblock
+the rest it's like here's a slow
+part I have some
+I asked the designer like I am the
+designer I designed some visual skeleton
+for that thing I'm just going to plug
+it in here
+yeah I think that's really
+cool that y'all are just seeing is like any
+slow data source no matter what it is
+I don't know what it would look like to say like
+wrapping a style
+sheet in suspense
+or something like that but
+that would be more
+automatic so if you imagine
+for example a component
+imports like a
+CSS module or something like this
+and or
+like some kind of static CSS
+and JS with like static extraction
+then you could imagine
+a compiler or like a framework
+would put the link
+tag for the style sheet
+into component output automatically
+and then the React would know to
+wait for that CSS to
+load before it can display the
+component it would put the link tag into
+the head or something like this
+so it would be automatic it's not something you think about
+but it's just
+it's just better than the
+current best practice of
+like either you load
+all CSS in the beginning
+for like the entire app or
+you do some kind of
+you do some kind of split
+in but then JavaScript can't
+even start executing
+for like independently of CSS
+because like they're grouped together
+and like you want
+to have this ability of start executing
+JavaScript even before CSS loads
+but then hold back
+the rendering until we actually
+have the CSS so that the user doesn't
+see unstyled content so this
+would be automatic or another example
+is like you have an image tag
+for example of like profile cover
+and you might want to kind of hold
+back showing the thing
+until you have the image
+you know unless it's like super slow or
+like there would be like a way to opt out
+so you would be don't wait for this image
+yeah that's the clearer one
+to me because I would love to have an API
+that's like suspense
+suspense fallback
+like blurred image
+and then inside of this
+is like the real image
+that we're going to wait on
+and that's conceptually what it's doing I'm sure
+you wouldn't just pass in blurred image
+but it would be
+it's that hook
+to not ship like
+the massive Gatsby image component to the client
+that does all of these fancy fetches
+like it's just telling the server
+stream in the blurred image then stream
+in the regular image when you're done
+yeah that's one way to do it
+but I think like it also
+it doesn't necessarily have to do with
+blurred images like I think you can
+think of this like blurred images
+as a kind of next level
+optimization that you could do
+but just the capability of
+being able to say
+like don't show until this image
+is ready
+like wait for it
+to pop in
+and then that could be a blurred one
+if you want to make it
+you know like faster
+or it could be that you actually
+wait for the whole thing
+you know with a normal
+image but then you do have blurred one
+as like a placeholder so it really depends
+on like how you put it so
+we'll see but the capability
+like the important part is just like
+it would be hooked up automatically
+to the suspense so suspense
+would act as you know you
+declaratively specify this is
+what I want to see if something
+inside is not ready and then something
+could be like data, it could be code
+it could be images, it could be stylesheets
+it's like anything asynchronous can
+work and you don't have to like do it
+in your head all the time
+yeah
+and that does feel like the message I've been
+getting from Next.js where it's like you know
+don't worry about deployment target
+that's automatic with how you're doing your fetch
+calls, don't worry about
+image optimization, just use the defaults
+and it'll load in the correct
+like webp, avif, whatever
+because
+these are decisions like
+we can make when there's a problem
+but a vast majority of the time
+we don't need to make it ourselves
+like there is a default that the framework
+knows about and it can probably just go ahead
+and do it
+yep
+yeah and I also never demo what this actually
+does and I'm realizing these annotations
+are completely wrong, I'm going to revisit this
+but the main thing
+that we're getting over here is like
+we get our welcome to server components
+and then a flash of fetching albums
+until the albums come down
+and then the only difference in the
+response is that now we have
+this like react suspense
+idea where what I'm assuming
+happens is like if
+it is wrapped in suspense
+it's going to say alright here's that hole
+that you mentioned, here's that
+separate component that you're going to
+slot in when it comes down the pipe
+but I have a fallback for you while you're waiting for
+that, don't like block rendering
+the whole page to the browser, actually
+go ahead and render everything before this
+show this fallback
+and then L3 is going to match up with this 3
+that comes down 300
+milliseconds later based on how we have it set up
+so it's just letting the server
+like show something in the meantime
+and stop blocking if it was actually an issue
+maybe you can increase the delay
+a little bit and then it would be
+more obvious because it's kind of
+really fast now
+yeah and if it
+I know, and if your delay is that
+low you probably don't need suspense
+I don't really know what the threshold is but you feel it out
+so I set it up here
+let's see what that does
+did it not
+oh I don't think it's watching, that's the issue
+yep I think my
+file watcher is only looking at source
+but yeah there we go, now we
+see like a full 2 second delay
+maybe it's getting from like the Discogs
+legacy API which is
+slow, I've used it before
+but yeah
+now you get like fetching albums
+maybe it's a beautiful skeleton that you designed
+and then the 3 is going to become
+this 3 as soon as it's ready
+but now we have a fallback so it doesn't have to
+wait on it
+yep
+cool stuff
+so I mean that's a basic demo
+of like suspense and fallbacks
+I
+well one thing I can do is
+actually top this off with an image
+on the top and then
+I was curious to get into how I could
+generate a search bar for this
+and what would be involved in that
+and I'll go ahead and do
+I think album.
+what do I call it, cover?
+autocomplete
+alt
+that
+album.title again
+that should be good
+now, well I'm going to
+oh god there's no styling
+let me see here
+I tossed tailwind on top of this thing
+just to make us move a little bit faster
+so let's say class name
+with like
+20 just so we don't have to worry about that
+let's see that
+oh yeah way better
+and also turn off the delay
+so we can start working on this more easily
+there we go
+okay and now in our
+server response now we're going to get the image
+but before it's just not going to serialize
+what you don't use
+which is kind of the beauty of it
+so yeah from here
+how could I set up
+a search filter that does it
+maybe server side, maybe client side
+yeah
+so that's really
+your choice
+that's kind of the fun thing about it
+you can do it either way
+and there are different tradeoffs
+so for example
+if you have the entire list
+let's say the thing
+we're talking about is
+it's mostly going to have maybe 50 albums
+or something like this, you want to always load them all
+then maybe
+it makes sense to do client search because
+well then it will be instant
+so it would be, we could just filter on
+the client and show the results
+and that's one way we could go about it
+on the other hand if you have
+thousands of albums and they're
+paginated or whatever
+and you don't want to download them all
+to the client
+then it makes sense to make the search driven by
+the server and just
+pass down the
+update the URL
+as you actually do
+each time you write into the input
+you do a router navigation
+through a different query
+and then on the server you read the query
+and you refresh
+you just send the new output
+so maybe we could do it both ways
+and just compare them
+how do you feel about that?
+Yeah, we can
+I don't know if the server way will work without
+page refreshes
+we have the Next.js
+escape hatch in this repo
+I put a Next app right up here
+so if we need to we can just drag this in
+I'm hoping
+but yeah, I think starting with clients is a good idea
+because we didn't even demo client yet
+or how it even works
+so I can make a separate file
+for that
+.jsx
+and try to call you in here
+and at the top
+you just put use client
+and sure
+no
+but close
+well this will be
+a search box so in this example
+it would pass through all of the
+album info as props I'm assuming
+right? Where it comes from the server
+and this is just
+what do you want, like what component structure
+do you have in mind? I think I'm not fully
+understanding what do you
+want to put where?
+Yeah, so
+the typical way that I would do it
+is this is a client component
+it receives the get
+all result from the server
+so all the albums come in here
+and then it has a form input
+that will filter what's showing
+and then it would render what?
+It would
+render either
+all the albums or the results
+like if your input's blank it would show all
+of them and then as you start typing it would
+filter based on the title
+Yeah, I think I just got confused
+by the file name because it's like album
+but I think it's essentially like searchable
+list or something like this
+Yeah, I think
+that's a good idea
+searchable, yeah searchable list
+is fine
+You like short names
+I do, sometimes
+I either go really short like
+search or really long like searchable album
+list. Yeah, searchable album list
+is nice
+like on the homepage
+I don't know if you've noticed like on the React homepage
+we have kind of a progression of
+examples building up
+and like it starts with like video
+then there's video list then there's like searchable
+video list and then there's
+like conf page or something like this
+so it's actually about
+the canonical example we picked
+so that's kind of funny that
+we're doing that now
+Yeah, I mean it works
+Oh, that's cool that it's called searchable
+Yeah, I've never said searchable
+I would probably say like album list search
+but yeah
+But then it sounds like the search is just
+like I think the thing that's confusing about it
+is it seems like it's just the
+yeah
+Yeah
+and so it's so hard to
+name your Lego bricks
+but this will work
+So yeah, search and set search, that's fine
+and we're not going to use
+like an actual search library for this
+it would just be
+well that's, yeah, you could just do it like this
+and this
+is really good actually
+Dang it Copilot, you took all the fun out of it
+but that is it, that works fine
+So
+Well no, that's actually not very good
+It's not a very good version
+because it
+it would search in the middle
+of the words, right
+so if you
+Oh sure
+I can, let me copy and paste
+I have a version that I
+that I wrote for
+for the React homepage
+that I can
+I can actually
+just copy and paste it
+so this
+is the
+yeah let me
+copy and paste it here except that's going to be
+filter albums, that's going to be
+albums
+that's, that you called this thing
+search, so I'll call this thing search as well
+and then
+the, what is the
+what is the
+we care about title and about
+what is the other thing
+that we care about
+Artist? It's just the title
+That's another field
+Artist, maybe
+Yeah, but does it have
+does it have artist in the album
+info somewhere, like what's the structure
+Yeah, and I can
+actually, I set this up with JS
+Oh yeah, okay yeah
+I'll just go ahead and do that
+Okay
+Yeah
+Yeah, sure
+Wait, what happened
+Oh, I think we're
+I think we're typing at the same time
+Sorry
+That should work, but okay
+Yeah, that should work now
+Yeah, and it's inferring, cool
+Alright
+And this is a nice little function
+So this is just searching
+I guess I'm looking
+at the split here
+So it's looking at each word
+Okay, some of the words start
+with a keyword, nice
+Yeah, it's not super efficient
+like it has some nested loops
+but you know
+not just some, it has like three levels of nested loops
+so it's actually pretty slow
+but it's fast enough for us
+Exactly, yeah, that's what I'm thinking
+Yeah, and does
+this handle the empty state
+where it's like show all of them unless
+you've started typing something
+Yeah, yeah, I think it does
+You know, it's
+Yeah, you can just pass the
+I'll go ahead and just do this
+Albums, search
+Nice
+And what now
+Well, there's no input
+Yep
+Yeah, I've
+heard on input it's a little more reliable
+and it's what I use
+No, no
+Is that the wrong one
+All right
+Never mind
+It's just a weird name in Quark
+It corresponds to on input in the browser
+Oh, it does?
+Okay, that's what I knew
+Oh, that's weird, all right
+The more you know
+So that's gonna be that, yeah
+This should all work
+So the last thing to do is just put it on the page
+So I'll hop back over here
+Let's add suspense again
+because it's annoying that
+I'm gonna do it because it's annoying
+that it waits so much
+So
+I'll just do
+a loading state
+because it kind of looks
+like something's wrong with the server components
+but it's actually just because we don't have suspense
+Okay
+Interesting, okay
+All right, so we have that
+and so
+we would put the client component in here, right
+Yeah
+I'm doing
+Yeah, you have to do that
+We can just do this
+Yeah, sure
+We'll fix it someday
+Someday
+Okay, so everything exploded
+sadly
+That could be on the build tool
+That is me
+Let me double check on that
+The next JS escape patch is looking great
+but that is the response
+that you'll probably get from the server
+because now what we're doing is we didn't filter
+which props that our client cares about
+Now it's passing down everything
+including the song list, which is like
+that little uncanny valley I mentioned
+If you're not aware, you can
+ship a lot of data to the client that you're not expecting
+So we could filter it
+but right now we're just passing down everything
+Yeah, which is what you were
+doing anyway in the single page app
+Yeah
+Can you show what's crashing?
+Because I don't see the
+Yeah, I'll give it a look
+This error doesn't make a lot of sense to me
+I just don't see the error
+I don't know if
+Okay
+Does it not show
+Yeah, it's crashing in the browser, not the server
+Yeah, but I don't see
+I think maybe your screen share
+doesn't show me the DevTools console
+so I have no idea what the error is
+Oh, I thought the screen share might actually show it to you
+Okay
+Interesting
+Yeah, it's being really selective
+But you're right, it doesn't. It actually hides the DevTools
+Alright, let me
+And this shouldn't be affecting anyone
+at home, this is just our crazy setup
+If I do this
+now it should work
+Maybe
+Okay, yeah, now I can actually see it
+Yeah, so
+Okay, this time it actually doesn't show an error
+That's interesting
+It just says loading and it never actually resolves
+I also made the dev panel
+a little too big
+Let's see here
+Well, yeah, on the key
+prompt, but wait, that actually
+doesn't make any sense
+Oh, I put the key on the list item
+instead of on the wrapping div
+I can do that, but that shouldn't crash the server
+No, that shouldn't crash the server
+No, it shouldn't
+Yeah, and it's also still
+Let me just reboot this
+and worst case, I'm assuming
+we can copy-paste
+Oh, there we go
+Okay, something happened in the live reloading
+which happens sometimes
+Yeah
+But we'll just go with it
+But yeah, it looks like it's still rendering
+on the page, which is good
+And we have an input
+but since it's tail-ended, it unstyles everything
+which is a little too aggressive
+Yeah, look at that
+So now we have it interactive
+searching for artists
+and stuff, and I can search by
+that as well
+Oh, I did the fancy O
+Yeah, it's working
+Some reason
+I don't see your screen updating at all
+Oh, really
+Yeah, it's stuck
+Well, I try
+I'm learning this setup as I go
+Maybe let's go back to
+the thing you shared before
+because that definitely was updating
+Alright, let's do that again
+If I do Chromium tab
+You'll have to just read the errors
+Just narrate the error
+Yeah
+Now I'm trying to find which tab it is
+I have too many tabs
+Oh, I called it future of React
+which makes me forget
+Okay
+Can you see that?
+Yeah, now I see it
+But it's really slow updates
+It's really slow
+But it does work
+Do you mean it's slow
+in the browser, or do you mean the stream is slow?
+Definitely on your end
+On the browser, it's immediate
+as we've mentioned before
+Okay
+So maybe one thing that would be
+interesting to show here is
+maybe like
+What happens if you remove useClient?
+What does useClient actually do?
+Maybe we could talk a little bit about this
+Yeah, well I'll confess
+when you remove useClient
+React complains that useState doesn't exist
+and that's just a separate thing
+with bundlers
+Yeah, so it's
+I mean, ideally
+Oh, okay
+It's actually pretty readable now
+So it's supposed to tell you that
+it's not
+like useClient is not supported on the server
+Yep, that's what I'm saying
+Yeah, so it's
+and like the way you would
+I think the mental model
+you would have, I don't know
+Can I draw in your Excalidraw link that you sent to me?
+Like would people see it?
+Sure
+Yeah, I can pull it up right here
+Okay, so let me
+let me try to open it
+One sec
+I just need to find the link
+But I kind of just wanted to show
+what exactly
+Okay, so I'll draw
+just below your diagram
+So let's see, can you see
+I drew a
+I'm supposed to have
+drawn like a rectangle just
+below your thing
+I think I need to click on the link myself
+because if I just go to
+Excalidraw.com, it doesn't show it
+Yeah, yeah, you need to go to the same link
+Go to the DM
+with that
+Excalidraw
+Alright
+I think we're here now
+Yeah, there we go
+Okay, cool
+So if we kind of think about
+our structure
+right now, it's like we have
+the server root
+and we have
+So this is the
+well, okay, so this is the
+module structure, right?
+Well, okay, first I'll draw
+the component structure. So we have the server root
+that renders
+albums
+that
+itself renders
+this searchable
+album list
+So this is
+this is the component structure, but then if we
+if we look at the, maybe I'll use
+like different
+maybe I'll use like a different
+different style
+So if we look at the file structure
+what we see is like there's
+the thing you call root.server.jsx
+it doesn't have to be named that way
+that's what you mentioned
+could have just been named like app
+or something, and so it imports
+the
+searchable album
+album list.js
+and so
+the
+the way to think about it is like
+by default we start with
+everything executing
+so like
+by default everything starts
+and like importing starts
+on the server, right? So like if you imagine like
+this is the server entry point
+it means that each import
+will be followed, you know, like
+like you would expect, and like
+all of this stuff would be on the
+like in the server
+when I say server, I mean
+React server, so like RSC
+React server components, I don't mean
+it doesn't, it's not about like being on
+the server in terms of location
+again, right? Like it's just the concept
+so by default all of these imports
+become
+part of the code that executes
+you know, as part of your server response
+and then like if we
+if we try to
+if you try to use state here
+it doesn't really make sense because
+this thing
+runs only on the server
+and so it's never actually
+going to be able to have event handlers
+or state because this code
+just never exists on the client
+at all, so it can't react to
+user input anyhow
+and so when you say use client
+and for some reason undo
+doesn't work so
+I have to, wait seriously
+oh really? I can undo
+yeah, I can
+undo this for some reason
+so when we do
+so I'll add use client again to
+searchable
+album list
+so if I add use client there, that fixes it
+because that redraws the
+boundaries, like when you say
+use client, you're essentially saying
+like
+cut this off, you're saying
+like
+this
+anything from here, this could
+import other components, this could
+import something else
+and so on, but you're saying
+anything that imports
+searchable list, this thing
+actually doesn't exist
+this should be on the client
+and it's going to client all the way down
+which doesn't mean that
+it doesn't mean that the
+it doesn't mean
+all components, so we're talking about
+files, we're not talking
+we're talking about imports, not about components
+you can still have components
+that are
+server
+components inside client components
+I'll get to that in a moment
+but what I just want to show is like
+you kind of
+sorry, I just can't
+delete anything
+like I have to
+there we go
+by adding use client
+you kind of just like
+limited the server part to
+this
+and then the rest is what
+your bundler will be
+will know to like, oh this needs
+anything from here has to go into the client
+bundle, and so the server
+environment would not even see this
+so from the server environment
+perspective, the searchable
+album list component
+it doesn't even know what's in there
+it doesn't try to render it, it doesn't try
+to do anything with it, it's just completely
+opaque, and then on the client
+from the client perspective
+like when you're actually
+on the client, it's really
+this part, it's like
+it doesn't exist, because
+it's already executed, so
+the client is only aware of
+the output of this thing
+it's aware of the output, right
+so one of the things that gets
+a bit, you know, that always trips
+people up is like, okay
+but does it mean that
+if I just need
+one, you know, component
+with state somewhere close
+to the top, then
+you know, it can't
+it can't contain
+any server components, right
+and we can
+actually, they have like another
+data point that
+we can fetch from, just to kind of
+illustrate this idea
+so you have getById
+maybe I can use that, do you mind
+if I write a bit of code?
+oh yeah, please
+yeah, so I just want to illustrate
+maybe let's go back to the app
+can we make sure the app is working
+so that, you know, it's not completely
+forked
+it's a good thing to check
+yeah, is this
+the screen share you're able to see?
+yeah, yeah
+but I see it like as empty
+so I don't know if it needs to be restarted
+or something
+oh no, we just need to
+well actually, this is on me
+I only detect double quotes
+yeah, compilers
+alright, that works
+oh, okay
+yeah, so maybe we can show
+the problem you might run
+into is
+so let's go back
+to
+for example, index
+oh, you have a
+can I use this Pokemon example?
+you have this Pokemon example in another file
+also Primogen, oh my god
+thank you for the raid
+we have a lot of people pouring in here
+right now, thank y'all so much
+thanks for stopping by
+that is awesome, you're awesome
+we're live with Dan
+playing with React server components
+and learning a ton of things along the way
+and right now we are playing
+with loading things
+asynchronously, seeing the server client
+boundaries, and I guess
+in a minute, trying to render some Pokemon on the page
+if you want to go ahead and try that
+yeah, so
+let's maybe import
+oh, you already imported Pokemon
+so that's great
+so maybe let's first just
+render the Pokemon
+above
+above the
+code is so
+I just can't get used to
+VS Code, but I'm just trying to
+render the Pokemon above the
+what is it, the album list
+actually
+I'm gonna pull it
+yeah, okay, yeah
+I'm gonna pull it out of the suspense
+because the suspense is super slow
+because we
+let's maybe reduce the delay
+I'll set the delay to something that's
+oh, we changed
+the delay back to be really short
+yeah, that should be short now
+yeah, okay, so we have a
+if we go to root.server.js
+you see there's like, we're rendering
+Pokemon, and we're also rendering
+this album list
+and so, suppose that we
+for some reason we wanted, like Pokemon
+is a server component, right, if you go there
+you see it has async await
+that's currently
+only supported on the server
+so, but imagine that in our
+app we want to
+render the Pokemon from a client
+component, right, like let's say we want
+to render it between the
+search bar and the list of
+items
+so, if you just try to do it
+kind of naively, it won't work
+so if I go to
+to the
+searchable album list, and I'm gonna add
+an import for Pokemon
+I'm gonna delete the
+I'm gonna delete
+the Pokemon from
+root.server.js
+completely, so I will
+get rid of it here
+and I will add it to our client
+searchable album list component
+between the input
+and the
+and the list
+and so if you run it now
+I think it should crash
+like, what does it tell you if you
+if you try to run it now
+I'm so curious why, but it didn't crash
+and it actually ran
+that should not work
+hang on, what's going on
+here
+yeah, it's working
+wait a minute
+but is it between
+can you tell the input so that we can actually see the input
+because I don't see the input at all
+absolutely
+yeah, it's right there, it's adding a focus
+ring to that
+let me add border
+solid
+okay
+yeah, maybe it's not
+I guess it's because it's using fetch
+so maybe we already
+support it on the client as well
+so ideally it would be something
+that would not be supported
+on the client, like a database call
+or something like this
+right
+maybe we can read something from a file
+to make this more
+make it more obvious
+sure, yeah, let's read something from the
+file so that we know definitely that
+yeah, can we do like
+okay, instead of
+pokemon, we're gonna do
+fs, let's see
+I haven't used
+can you write some
+yeah, I can throw that down, I've only been writing fs calls
+for the past however long
+yeah, can you do like
+readdir, like a list of files
+for example, in your
+yeah, fs
+promises, readfile
+maybe readdir
+to kind of see the list of
+files in the directory or something like this
+yeah
+or I guess, yeah
+that's a thought too, yeah, I can read anything
+okay, yeah, whatever
+yeah, this isn't
+the best thing, maybe if I
+tried to read from the db
+that would make more sense
+sure, there's a thing you could do
+db, data
+data
+at slug there, which is a real
+slug
+yep
+and that, yeah
+and then you want to do that
+return
+you know, a dump
+a dump of information
+sure
+what's that
+awesome
+yes, maybe let's
+see what happens if we try
+to do this
+or it's already stringified, silly me
+alright, so we do that
+and then it says, can't resolve node fs
+that does make sense
+yeah, it's built into node, are you trying to bundle for node
+this is an esbuild specific thing
+but this is what you would run into with the bundler
+where it tries to bundle
+this into the client
+and it decides, well, you can't import
+from node on the client, so I'm gonna
+fail out
+right, and so the way
+and then the way you fix it
+the way you kind of do this thing
+where, you know, the
+I'll switch back to Excalibur
+can I see the Excalibur
+yep
+okay, so, yeah, so the problem we have
+right now is like, we're doing this
+and, again, this thing
+is, this
+is rendering, like, Pokemon
+which is not actually Pokemon
+it's a York album, but let's say it's Pokemon
+and then this thing is actually
+like, it can only
+work on the server
+right, so because it uses, like, node
+or something, so it actually, like, this
+is why it errors
+and so the way
+you would fix it is
+you can
+but, and, like, you're
+the component structure that you want to have
+looks like
+this, so
+this is what you're trying to do
+but the problem is, like
+this is a client component
+and so you can't import the server component
+from client component
+but what you can do is
+keep the component structure
+kind of
+the same
+except you render
+there's not a great way to show it
+but they kind of
+render it
+let me try to
+make this a bit nicer
+I don't know why this didn't work
+let me just show it in code
+and then I'll try to redraw the picture
+so in code what you do
+is you
+so you go back
+to here, so
+we go back to searchable
+album list, we can't render
+Pokemon here because it's a server component
+so what we're going to do instead
+we're going to make a hole in our component
+so we're going to accept children as a prop
+from above
+so now we
+it's just like, you know, it's the same way
+it's not server component specific thing
+it's just how you make a hole in the component
+that the parent can fill in
+and so we copy and paste
+Pokemon again, we
+go back to our server component
+we paste Pokemon import here
+and so we
+this is not necessary
+and so what we do is this
+we pass Pokemon as a child
+to searchable album list
+and so
+yeah
+and so I think this should work
+if you, I don't know, can you try it
+yeah
+let's give it a try
+and also just for my own
+sanity, I just want to rename
+the component
+if anyone's popping in, because apparently there's
+2,000 people
+if that's true
+hello, and thank you
+so much
+let's pass that in
+so this is a file system call
+that we're passing down as a prop basically
+in order to slot it into our page
+so I'll go ahead and do that
+and hopefully that's
+everything working
+so we head over here
+we should see that
+and then, oh no, things have happened
+okay, that's
+it's just trying to fetch a file that it can't find
+yeah, that's just me
+getting file paths wrong
+I'll head over here
+and because it gets built to a dist folder
+it's actually different, that's the issue
+there we go
+alright, so now we actually get
+the readout from the file system
+passed down
+the server component output
+so the thing that
+in our case is just
+it's reading from a file, but
+it's kind of stuffed into
+between the parts
+the client parts
+and the way we can maybe
+like the way
+let me try to update my diagram
+so in
+this example
+if I'm using blue
+for
+so we've moved
+you see the way we import things
+has changed, right, so the component
+tree is still the same
+like the pokemon is kind of rendered
+inside of searchable album list
+but the way the imports
+are structured is that actually
+root.server.js
+imports searchable
+album list and it also
+imports pokemon.js
+sorry
+it's not pokemon anymore
+it's searchable
+so yeah, I'm going to change that here as well
+and so it
+it imports this file as well
+and the use client
+is only
+let me take this
+so now use client works because
+I think I can just change this
+to like blue, right?
+sorry, I forgot about
+the
+so it's kind of
+like an island, yeah, sort of
+like anything imports will also
+be like in the client bundle
+but then the remaining stuff like
+that
+still executes
+on the server only and so that's
+why it works
+yeah, exactly
+and I mean you're using all the terms
+that we've used at Astro
+I was kind of freaking out a little bit when you said
+donut islands on a stream the other day
+I was like that's what we call them
+where what you're doing is
+you've created this
+an island of client-side
+logic and you
+want to pass something through a hole
+in the middle as a prop
+where really anything can be
+a prop that's passed down, it can be
+data or it can be JSX
+and in this case that's what
+React is doing, like Bjork album has
+become
+a prop that is going to
+render this stuff out on the server
+get that data and then
+pass it into the client
+so that's another thing about fetching too
+what's going to happen is it's going to fetch all the albums
+in this setup right now
+then it's going to fetch the Bjork album
+with the file system call
+and once both of those are resolved
+it'll pass this guy down
+do I have that right?
+not quite, so in this example
+I think if we
+specifically talk about the ordering
+I believe it will
+try the
+oh yeah
+because await is
+above it
+so it's going to fetch the list of
+albums and then it's going to
+get here, it's going to render the Bjork
+album and then it's going to tell
+the client, hey here's
+the thing you should slot into
+the donut and here are
+other, because children
+is just another prop
+there is actually no specific
+it could have been called
+donut content
+equals this
+right, and then you would
+you would also
+because it's just a prop that you pass
+and then with
+server components, when it
+meets a client component
+with a bunch of props
+it tries to serialize those
+props into JSON
+and when it meets more JSX
+it's like, oh I guess I have more server things to do
+so that's why it kind of steps into
+the Bjork album and tries to resolve that
+and that becomes part of the stream
+so that's how it works
+very cool stuff
+and yeah I was
+hoping these devlogs would kind of show you
+that but I think these headers are
+completely wrong, the important part here
+is like, well what's
+coming down the wire on this part
+and I hope you can still see it, there we go
+maybe we can make
+the, I think it's just confusing that
+it's such a long output
+let's just slice
+the first 10 letters
+or something like this, is that
+how you, no I think
+0, 10, maybe something like this
+oh yeah we can do that too
+so maybe let's look for
+let's have a look at what's happening
+in the dev panel
+maybe also let's show just
+one first album
+so that we
+don't have so much to read so I'm gonna make
+it like albums, album
+0, so I've dated
+that you only see one
+nice, okay
+and let's now have a look at what's actually
+happening in the
+response from the beginning
+yeah
+so I mean what I'm seeing
+is it starts from showing
+you welcome to server components
+then we show our loading spinner and we're gonna
+wait for the next chunk to come down to replace
+that loading spinner
+and that's actually here
+interestingly, so the 4 and the
+3 are a little out of order with what it
+decided, it can always
+change, but the client part
+is just gonna be an import
+so this is gonna go import that
+file and we don't care what it does
+we're just gonna import it and assume it's browser
+ready javascript that we can throw on there
+and the
+information is gonna be there
+maybe the way I would describe
+it is, if you scroll back
+up a little bit
+in the
+response, notice that
+in the protocol we have
+for example like h1 or
+there's like names of
+the tags, right, so we
+kind of say, this is a react element
+this is a part of the react tree that's like
+h1, but then
+if we also want to be able to
+say, here's
+a react component
+you need to download
+from a script tag
+and render, and so if you look a little
+bit below
+where it says later response
+instead of h1, you see
+this $l4
+which is again implementation detail, it doesn't
+actually matter, but this is
+a reference to the
+previous thing in the response
+so instead of h1, you're rendering
+searchable album list
+so this instruction tells react, here's
+where to download this code, it exists
+in this script tag
+so this is what I meant
+by automatic code splitting
+because if we remove
+searchable, like if we edit our
+server with
+component for example
+to check your
+privileges and be like, if you're not an admin
+don't show searchable
+album list, then
+the server will not send the instruction
+to download searchable album list
+so you wouldn't even have it, you know, you wouldn't
+load that bundle at all
+because it's just not necessary
+so this is what I mean by automatic code splitting
+but yeah, other
+than that, it kind of says
+the later part of the tree is
+this module called searchable album list
+that exists in your bundle
+in your example, it seems like
+it's like a separate file
+like in optimized bundler
+you would have them split into chunks
+that have more than
+one component of course in them, otherwise
+you'd be downloading too many script tags
+but yeah, you can see
+it says render this thing
+that's like a client component
+and here are its
+props, and so you see album's prop
+contains the
+album stuff
+and then if you scroll down
+it says children L5
+which is like
+reference to some content chunk
+that arrives later
+It's actually the Bjork album, but we
+chopped off very few characters
+Yeah, yeah
+I might bump that to like 50 or something
+and then it'll show you just a little bit
+it actually shows you a lot more, doesn't it?
+Oh yeah, right here, so this is the later later
+chunk once that is resolved
+and that gets
+passed in as a prop
+it gets harder to trace the more components you have obviously
+which makes sense
+because this is just a dump of what it's actually sending down
+but I see what you mean
+like oh, it would be right here
+so the children of this
+component are going to be 5
+whenever it resolves, and then here it is
+here is that dump
+from the Bjork album file
+and we're going to pass it into this component
+which I think we can trace back up
+to
+somewhere
+5 is
+right at the end
+5 is children L5
+Yep, and that's being
+passed into searchable album list
+so the numbers correspond
+where it's like that's the data
+that's the children prop that we're going to pass in
+and all of this corresponds to number 4
+which is
+the actual album list that we're rendering
+onto the page
+and all of this is
+composable, so of course if you put
+suspense
+around the Bjork album
+now, so you do
+like, I don't know
+let me try to
+do something here
+I'm also forcing
+Dan Abramov to use VS Code, I'm sorry
+people, are you a Vim user?
+No, no, I can't
+but I'm a happy
+Sublime user, I don't understand why it keeps
+trying to close my tags, like it never
+does it the way that I want
+Yeah, it's a Prime Machine raid
+so I have to ask about Vim, so
+it's neither, you use Sublime tags, interesting
+So I'm also
+going to add an artificial delay
+here so that we
+can, let's say, wait for
+wait for like 2 seconds
+like imagine this file system
+call is super expensive
+so maybe let's have a look at what
+happens after this
+Yeah, let's see what happens
+Okay, something
+failed with just parsing
+the file
+Don't know what happened there, let me double check
+It might have tried to save at the wrong time
+I know VS Code can get out of sync with that
+Yeah, there we go
+Okay, and yeah, now we have this out of order
+streaming setup
+where when you load the page first
+it loads everything
+then it does the file system call and it slots
+it in here later
+while preserving the other markup
+that you have
+Yeah, and so the cool
+about it from my perspective is
+like in
+you know, we parse some
+server stuff that still might be
+waiting for something, but we kind of
+unblock the rest of the
+even like client stuff from rendering by
+just putting suspense in there
+Yeah, exactly
+It's the easiest switch to slot into
+where the default is like wait for everything
+which is usually what you want so you don't
+have layout shift, and then it's like
+well actually I do have
+I actually have a way to handle layout shift
+I have like a loading spinner that's a perfectly sized
+skeleton, so I'm going to see
+Yeah, here it's not really ideal
+what we're doing where it like bops things
+down the page as soon as it comes in
+because you know, if that's like above the
+fold on your hero banner
+you probably want to have like a loading state
+that's matched up to it
+Yeah
+So I don't know how much
+time to have
+but how deep do we want to go
+because it would be fun to also
+like I added a bunch of hacks just to
+kind of show the idea
+but I think it might be fun to
+get rid of the weird
+PR problem component and instead look at
+what it would look like to
+refetch, like to do
+search on the server, I think that's like one
+That would be very cool
+Yeah, I mean I only
+booked two hours to like be conscious of your time
+but if you're good to keep going, I am
+as well
+I think I have some more time
+I don't have to run anywhere
+Okay
+So to do that, I'm wondering if
+we can, should we hop over
+to the Next.js example to try server search
+or are we still comfortable here?
+I think we can try to do it here
+like if it doesn't work, we can do
+you know, we can use Next.js but now I'm kind of like
+you seem to have a setup that kind of
+works and I like the
+you know, I like your
+I like your, it's
+no small effort because like none of it is documented
+so it's
+yeah, it is
+impressive, so I'd say
+let's keep going until your setup breaks
+I like it, it's gotten
+close, it's definitely gotten close
+but the duct tape's holding
+Yeah, I really like your development panel
+I think I'm a bit conflicted
+about it because I'm worried
+that like people on the stream would be like
+oh, this is so complicated, like
+this whole output, but it's really
+kind of like reading the network tab
+so the point is not, you know
+you wouldn't see this as a user
+but I do see the value, you know, as an
+instructional tool of here's how it actually
+works, because it's not that
+complicated if you think, you know
+about what it's
+trying to do
+Yeah, exactly. Yeah, the dev panel
+was really, I just intended it for
+like the first 30 minutes to show
+oh, here's the data streaming down and now
+it waits for suspense, but it's like
+it's also kind of useful to see like how much
+stuff is coming down, like when we
+pass down albums as a prop
+suddenly the response got huge
+because now it's passing down like all the songs
+and stuff that you don't care about, so
+it's useful to just see like volume and time
+not necessarily the details
+so maybe just like showing
+well, it's always dangerous to show kilobyte
+numbers because they're lies, but there's probably
+a way to do it
+Yeah, I'd love to see them both
+so let's
+let me just clean up, I want to
+get rid of this part that doesn't
+make sense because we just added it
+as a demo, so let me
+clean it back up to what
+we had that
+still made sense
+as an example, I'm gonna get
+rid of this children prop as well
+Yeah, so I think
+we should be back to our previous
+example
+and instant
+search
+and yeah, do you want to
+do you want to try to add the
+like the add in the
+so what do we want
+to do, right? Like we want to
+we want to refetch
+the server component tree
+when you type into the input
+right? Right
+so maybe we want to
+do like search on the server
+maybe we show like just the first
+like, I don't
+know, two results
+it doesn't seem to have like much data here
+anyway, right? But maybe we
+Yeah, there's only three albums
+Okay, yeah
+Yeah, so do you want to
+do you want to drive
+edit and we'll see
+where it becomes confusing
+I can try to do that
+and one thing before we go
+I'm actually going to
+make the dev panel just a little bit
+less tall in case
+we have issues with that
+I, oh man, I thought it would be an easy switch
+where did I put it
+yeah, okay
+72
+yeah, alright
+and it scrolls for the rest, perfect
+so in order to
+do something like that
+well the first thing
+I'm going to do, I guess
+and this feels like a coding interview right now
+I'm thinking, but
+yeah, we can remove that
+we're not going to use that anymore
+no use state
+the filter album function is fine
+to keep around
+and as you input things
+I assume we're going to
+well, if we put query parameters
+on the top of the page, it's going to refresh the
+browser on every
+input, but if we did like
+JSON requests, then we could avoid
+refreshing the page every time
+I don't know, there's two ways to do it
+so I think
+the, maybe you're kind of
+approaching it from the perspective of like
+how would I do this in a client-side application
+so you're like
+yeah, well I'm thinking form requests, I guess
+like literally just using form action
+and submitting it and using stuff
+but I assume you have
+something else in mind that isn't just a form action
+yeah, so if form action
+is usually used for stuff
+like post, I guess
+here we kind of just want to refresh
+the output
+so I think I would probably use get
+but also form action
+yes, like default browser
+handling of forms, like that would reload
+the page completely
+so it makes sense that that's not
+quite what we want
+I think the
+so let me maybe think a little bit
+about this as well
+so I think we still need
+I think we still need
+state, actually, because we want
+the
+well, not
+okay
+okay, so there's a question
+of like how deep
+do we want, because this is the stuff that
+Next.js or an RSE
+framework is supposed to handle
+so I think there's kind of two
+levels to this, like we can
+do this with
+like do we want to hook it up to the URL
+because one option is to
+hook it up to the URL
+and other options like not to
+I think
+probably not hooking it up to the URL
+might be a bit less code
+so maybe we
+sure, yeah
+maybe that's
+maybe that's what
+yeah, because I guess what I'm wondering
+is, because what we're trying to avoid is
+passing the whole album list as
+a prop and doing the filter logic on
+the client, so I assume
+that would also mean if we're not passing down the
+prop, where
+if we're doing anything client-side, it's just
+going to be the search box, but not the
+Yeah, exactly, yeah, so maybe let's
+do you want to like rearrange
+the code a little bit, like I think I would
+just move the
+yeah, so maybe we do like
+the search box component
+and we make that a client component
+and then we extract it to like a new
+file and then we keep this file
+as it is
+Yeah, let's go ahead and do that
+I'll make a search over here
+and pull that out
+and also, I'm actually just going to
+undo my way back here
+I won't save that because I think that
+breaks everything
+Okay, I'm in the search now
+and in here, I will
+do input
+Oh, it doesn't know about state yet
+so let me introduce that
+This is so much fun, I'm really enjoying it
+Oh, it remembered my styles
+It remembered my styles
+Oh, that's so good
+Okay
+I don't even understand, like, you're
+using Copilot or something
+because I've never used it, I don't even know how
+what it is
+So, I think Copilot
+and actually the Prime Engine had a good
+video on this, where like for
+migrations, it's really good
+at knowing context, of like
+it knows I typed a search box before
+and now it's picking up like, oh, you're probably
+extracting this to a separate component
+Let me pull in those styles that you wrote earlier
+So does it like
+stuff it into the prompt? Like, how
+does it keep track of the context?
+Well, it understands
+your code base, as far as I know
+and it is
+I don't know how much of it is local
+versus network requests
+but, yeah
+We should have a dev panel to see
+what it sends and what it receives
+That would be nice to know
+because like, yeah
+if it's sending your code base over to
+Wired, that is a massive problem
+I don't know what it
+does. That's the scary part
+I don't know what it says
+It's fine. Yeah, so let's
+Okay, let's go. Let's get this working
+Yep
+And everyone is searching for what my
+theme and font are. Just calm down
+I'll make extensions someday, people
+But I use Monolisa font and the
+Houston theme, made by Astro
+and by using it, you get access
+to this beautiful little Houston floating guy
+in your editor, anytime you want it
+So, you know, go ahead and use that
+Dan, you actually can't see that, sadly
+No, no, I see the default theme
+Yeah, dang
+Yeah, we have this little
+Houston animation
+where it's just a Houston panel, if you want to
+just have him watch what you're doing
+and he gets progressively more sad
+the more syntax errors you have
+Okay. Yeah, I have no idea
+what you're talking about, but
+Don't worry about it
+I can send a screenshot later
+Okay, okay
+But yeah, we have our search box here
+and
+well, we can render
+that inside of our root server, I guess
+We can hop all the way back
+Well, why though?
+Can't we just render it in
+the component
+you extracted it from?
+That's a good point
+You already have it here
+And I guess our filter code
+is going to go over there, too
+No, I mean, I don't think you have
+to change anything
+Oh wait, no, it doesn't go over there, that's the whole point
+Yeah, yeah
+Here is where it goes in
+Yeah
+Yeah, so the problem
+right now is that you don't really have
+Yeah, you don't really have filtered albums
+yet, but we'll add it back
+later
+So I think for
+I would write it like this
+And then the thing you want to
+render is this
+Let's just verify that it still works
+Yeah, it is working
+But then typing into the input
+doesn't really do anything, right?
+Right
+So I think maybe
+again, there's two ways we could go
+about this, either
+with the URL or
+without
+I think with the URL probably makes
+more sense, because if we're
+going
+to show what frameworks do, we might as well
+just try to do it
+ourselves
+So maybe let's make it so that when you type
+into the input
+let's make the URL update
+using client-side
+like history.pushState
+We could use the history package
+I think it's a bit more
+But we could probably just use the browser API as well
+Let's start with the browser API and then see
+if we need anything more
+But let's try to make it so that when you type
+into the input, we also update
+the URL
+Gotcha
+Yeah, for something like that
+On
+change, sure
+Basically that
+But then we want to also
+I have to think about this
+So is it window.location
+pushState
+It's been a while since I've used this API
+I think it's history.pushState
+Yeah, I think it is
+history.
+Yep, yep, yep
+pushState
+I think
+So there's like pushState and a replaceState
+I don't know if the search bar
+is like
+Yeah, that will
+We don't want history
+as we type
+So maybe let's check
+if this works
+I don't actually see your address bar
+so I don't know if it works, you'll have to tell me
+It's really tiny at the top
+but it's up there
+When you bump the font size
+it doesn't bump the size of that, sadly
+I don't see it because
+it doesn't share
+Oh, it doesn't
+That's so silly
+Well, it is working
+I can tell you that much
+It is working
+Just putting up search equals
+Okay, I'll have to believe you on this
+So
+Okay, so maybe let's
+I think I might
+have to drive this a little bit
+if you don't mind
+I will need your help
+as well, I think, because I
+can only do the parts that I know about
+So I'm gonna
+go to the thing
+called root.client.js
+and it's kind of interesting
+You do have
+kind of the server entry point and the client
+entry point
+and it's a bit confusing because conceptually
+it's the server entry point that's
+the real root of your app
+It's the real root
+where things start conceptually
+but then
+in reality, you do need this bootstrapping
+thing that makes
+this real root appear somewhere on the page
+Yeah, what I really want to call it is
+bootstrapping and index
+Yeah
+I think that's what it is
+It's also kind of like, if you think about
+how would it work with nested routing
+you would also
+have the server
+be the root
+It would also be possible to start
+from the middle of
+some nested route and treat that
+as a root, and that's what happens with
+navigations in NextAppRouter
+and then this thing
+that you have here, this bootstrapping
+thing, that would turn
+into the client-side
+routing part
+that bootstraps
+the top-level thing, but also
+bootstraps these holes
+and manages
+how to slot in the server responses
+into them
+This is hidden in a framework, that's what
+Next.js does, for example
+but we're going to do a simple
+version of that where it only bootstraps
+them at the top, but I'm just saying
+if you were building a nested router
+you would have to
+have a very similar thing
+managing it somewhere
+around your
+route holes
+to replace them
+if necessary
+But yeah, so
+you have this thing where here
+so these are internal APIs
+this file is the
+kind of stuff that, as a product developer, you
+wouldn't touch or do any of
+that, and I also
+want to make clear that
+all of this stuff below is
+for debugging, because it's
+your dev panel component
+so it actually has nothing to do with React
+but then
+as a framework developer
+this part is kind of the bootstrap
+where you're like
+okay, here's where
+I'm going to move this here because it's unrelated
+Yep
+Like
+Honestly, all of this is unrelated
+This was me trying to
+I never finished it
+Wait, show me
+what did you delete?
+Yeah, this was some code I was writing
+to allow multiple routes
+and all it was really doing is getting
+the current window location and fetching the
+file that corresponds to that location
+Okay, yeah, no, we don't need
+that, but we are going to need something
+similar, but let's
+delete this for now, it's fine, let's delete this
+So what I'm going to do is
+what it currently does
+I don't love this, can I just rename this
+to slash
+Yeah
+I'll see what source code needs to be fixed to make that work
+but yeah, that's what it is
+I think it's in the
+handler, right?
+Yeah, I think it might just be this
+So maybe let's change this
+to rsc, let's verify that it
+still loads
+I mean, obviously it doesn't have to be called that way
+I just kind of want to stress that
+Okay, yeah, so there's just one
+endpoint, it's not like multiple files
+or anything, it's just one endpoint
+And so I'm going to make a react
+component that's like
+I don't know, I'm going to call it
+like boots
+I don't know, client
+root or something like this
+which is just this bootstrapping
+thing
+And currently
+Yeah, I'm going to move
+I'm going to move this a little bit, so I'll make it
+render restrict
+mode, and I'm just going to do this
+client root thing here
+Okay
+Our
+component
+And then I'm going to
+So again, this
+is like create from fetch
+This is like an internal API
+for framework developers
+This is the protocol reader
+So we have a protocol writer
+that runs on the server, so if you go
+to
+the
+Yeah, so if you
+go to the handler, this is where
+you wrote this logic
+for the actual handler
+of this endpoint that runs
+server components, you'll see
+you have
+So you call this react-server-dom
+which is maybe a bit
+confusing because people might think it's
+like react-dom-server
+I didn't know what to call it
+Yeah, I don't know either
+React-server-dom-webpack
+And I thought, is that really what it is?
+But that's the package
+I don't think we actually figured out
+how to name this thing
+This is not
+SSR, this is not
+the react-dom-server
+that emits HTML
+This is the thing that emits
+This is the protocol writer
+This is the thing that executes
+your server components
+and emits this protocol
+this streaming thing that you show
+in the dev panel
+And so the
+it comes from this package
+I don't actually think you need
+that browser here, I think this should just work
+Can you check if that
+Oh, I guess I broke some other
+I think it'll try to import
+the node version, and that uses
+pipes, and I was like, I think I can do it simpler
+So I did it this way
+Okay, cool
+Alright, and then
+Yeah, if I go to the correspondent
+this is the reader
+This is the thing that
+reads the client protocol
+and really, all it does
+is it turns it into
+JSX, essentially
+So it converts the
+it streams the output
+from the server, and it converts it
+to a tree of
+lazy components that get
+filled in later
+And this is why
+it's kind of funny, React
+the React library
+doesn't really have any code to support
+server components
+because it's
+like, this ability to
+render a tree from the server
+it relies on exactly the same
+mechanism that, for example, React.lazy
+uses, which is just
+this built-in support in React
+to have a tree where some parts
+are not ready, and then suspense will catch
+them, and so this is the thing that
+translates from the protocol
+to a lazy React tree, and then
+React knows how to deal with lazy trees
+And so the
+we could maybe
+call this stream
+create from fetch, and then you have
+fetch from this
+RSC endpoint, I think that's how it
+worked, and
+I guess we can just say this is
+just JSX
+maybe, well, lazy JSX
+I don't know. Yeah, lazy JSX
+Yeah, the best
+way is like, that's the interpreter
+that's going to take these instructions and
+turn them into JSX, and that
+is actually what we get
+Yeah, so maybe let's see if
+this works so far, because I'm going to
+add a few things
+Okay, can I
+refresh it?
+Yeah, it's working
+Awesome, and so the thing that we want
+to be able to do now is
+before we deal with client-side
+navigations and stuff, I think
+what we want to do is just
+to be able to pass
+something during the initial load to the
+server, right? That's the easiest part
+It's like, if you have some
+query in the query string and you
+refresh the page, at least we should be
+able to ask the server to
+filter for that
+It's like with manual refreshes for now
+and then we'll fix that
+So I think what we want to do is
+we can look at
+I don't actually remember
+how to do it, but
+Okay, so here's what I want
+I want to
+search equals
+Okay, so
+let's actually start there
+I want to search for
+what is it?
+Yeah, let's say
+fame, that's what I'm searching for
+This is my search query
+So I'm going to look for the album
+of fame
+And then I will go to
+the server handler
+So now we need to plumb that information
+into your root server
+component so that it knows
+what the search
+parameter is
+And so I'll go to the
+your server
+handler. Again, this is the framework
+part, like a framework
+Yeah
+And they have path name
+So that we pass the query
+Like we pass
+all the query arguments as
+props to
+Yeah, it should be right up here
+So it's just a web-friendly URL
+So we can just do search params
+and grab that
+I'm so bad at these APIs
+I'm like, I don't remember
+I think it should be like has and get
+in order to access
+what we're looking for
+Yeah, it can be turned into
+just plain JSONs so that we can
+spread it as props to the
+Docker component
+I think there's a way to do it
+if you do like
+Ah, there's a simple way
+and I can't remember what it is
+search params
+JSON
+equals, yes! That's it
+Yeah, you convert it to an object
+and then JSON stringify it, thanks
+Well, okay, then you would have to parse it again
+But
+Hang on
+No, just this
+Yeah, just this
+Okay, is that
+Okay, we'll see
+Let's see if it works
+So now we want to
+Yeah, and now we want to
+This is your app here
+This is the rooted-server.js expert
+So this is your
+It's actually
+Oh, okay, you're calling it
+I think that's a bit wrong
+I mean, it ends up working
+Yeah, I couldn't get it working without calling it
+I don't know why
+Like, I think this is supposed to work
+So I think you're supposed to
+I mean, you're like server root
+That's how you call it, right?
+That's just the expert of this thing
+And I think you're supposed to be
+Can I use just the expert?
+Yeah, no
+I don't know how to process on this thing
+You could use react-create-element, right?
+Yeah, yeah, that's what I'm going to do
+So I'm going to do like
+convert createElement
+from react
+And I'm going to do
+createElement for server root
+And I'm going to parse it
+Well, I'm just going to parse
+the search
+params object as props
+And then in the server root
+I'm going to try to
+read the
+What did I call it?
+I call it search
+Which has nothing to do with search API
+It's just like our variable name
+And I'll say
+we are
+the bytes of keeping certain things
+in the wrong place
+I'm looking for search
+So let's see if that works
+Try to load it with like
+search
+Construct your search of undefined
+Okay, so the props aren't being passed
+but I think we have to restart
+Because it's not going to
+Okay!
+Oh my god! It's working
+Okay, nice, nice
+Whoa! Oh, that's cool
+Okay, so now your task
+is to
+I want you to do the
+to take search into account
+and do the filtering, like add the filtering back in
+Mm-hmm
+Yeah, that's interesting
+Because I would want to do it from here, right?
+Because I need to trigger a new
+create from fetch
+Well, let's not think about this yet
+So for now I just want to do it for the first render
+So it's not going to respond
+to input, but let's just make it
+respect the initial URL
+Mm, okay
+So for now
+you just need to plumb down
+We got it in the root components
+Connect the logic so it actually does the search
+on the server
+Okay, so we would need
+to pass this search down
+Yeah
+I mean, ideally a framework would make
+So the way this works in Next
+is they make it available as
+import
+I don't know, import search
+part
+I think there's some way to get it without
+plumbing it down in Next
+Mm-hmm
+Maybe I'm confusing it with headers
+I can actually check
+Yeah, because you can't do hooks
+when you're passing down server
+contacts, that's still like an unexplored thing
+Yeah
+Yeah, okay
+Page params are props
+like they become props to your page
+function, so it's
+pretty much almost exactly
+as Next.js would do it
+So yeah
+let's keep passing it down
+So I do that
+and
+we've done that
+I don't think you passed it to this album component
+I think you missed it here
+Oh, did I?
+Okay
+I passed it down to searchable album list
+and I passed it to search
+Yeah, but you don't pass it to album search
+It's undefined
+Oh, yeah
+That's actually good, Squiggles
+Yeah
+Squiggles
+Yeah, the squiggles are really annoying
+There's some kind of thing in TypeScript
+where we need a solution
+to allow
+async await
+Right
+Okay, and we have it
+in our input right here
+Okay, but we also want to have it
+in the... wait, what did you do?
+Let me see what you did
+So this should...
+Yeah, so that makes sure the input matches
+what's actually being passed to the server
+and now we can also use it here
+which I assume is actually what you're asking for
+to start with
+So we have filtered albums
+and that can just be
+filter albums, pass in the search
+Yep
+Okay
+It works
+Nice
+So it works for the first load
+but then it doesn't... like if you type
+if you type into the input
+Yeah, it's not refetching
+It's not refetching
+Okay, so I'll try
+the refetching piece for a little bit
+So I think
+for refetching
+the way we would do it in the framework
+That's my...
+Wait, let me open the right file
+Okay, so I'm going back to this
+I don't actually know, do you see where I am
+in VS Code?
+How do you know which file I'm in?
+Does it show you?
+Or which part are you asking about?
+Do you know where...
+Do you track where I am in VS Code?
+Oh yes
+No, I can't. I'm in the file
+Okay, cool
+So what we want to do here
+is essentially...
+This is the framework bit
+But what we want to do here
+is we want to
+replace this thing with
+another stream essentially
+and show that JSX tree
+instead
+So
+the way we could do this
+is... let me
+think a little bit
+So
+I think
+the way we would do it
+let me write a little bit of code
+So
+I think we would hold the...
+So we need to create a cache
+Yeah, this is what I was trying to build
+a little bit ago
+where I wanted to call createFromFetch
+inside of here
+and be able to
+store the lazy JSX
+in a state variable
+and return that result
+to re-render
+Yeah, yeah
+So I think that's kind of what we want to do
+and
+maybe
+maybe we can make
+actually like this
+ClientRoot, I'm going to call
+I'm going to have a component called
+a router
+that renders ClientRoot
+and I think
+from the perspective of the ClientRoot
+I think I'd like it to receive
+the
+should it receive the search params
+or
+I'll just
+call it router for now and I'll write
+the line in the router and then maybe I'll split
+the components
+But I think I want to have a
+I want to have a cache
+so
+it's just going to be
+just a regular map
+So I want to
+I think I want to keep a
+this
+createFromFetch
+this represents build the stream
+and kind of response you can use later
+because it's
+as long as we don't create it during rendering
+it's going to be showing the same thing
+So I think
+what we want to do is we want to
+I'm going to turn
+off the light because it's getting really dark
+Oh, okay
+So I think we want to keep it
+keep
+a response cache per
+this string
+This is going to be the key
+of how we're going to
+cache it. So I'm going to have a map
+Oh, yeah, you're already
+jumping ahead to caching there
+Yeah
+So the initial
+version I'm going to do is like
+if the cache does
+not have anything for
+Yeah, so the
+router
+Okay
+Okay, so I'm going to
+I would assume
+that this is like an effect
+that's going to update as the
+window updates and we're going to use
+that to trigger
+I think we're going
+to do that, but
+we're going to get there
+Give me a moment
+I wrote this kind of code like a couple
+of times, so
+I'm still not sure what's the best way to structure it
+But I think
+maybe I can call this component
+server output
+That's kind of what it is
+And then this
+is kind of the URL
+I'll use URL as the key
+And so I think that is the part
+Yeah, and then the router will
+return server
+output
+And I'll just hard code the URL here
+So that will be the
+kind of the initial URL
+And later we'll make it
+respond to
+the client-side routing
+But I think what we want to do
+is
+I don't need this anymore
+Instead, the router
+renders this thing and this thing
+I guess maybe I call
+this server
+endpoint
+server endpoint
+Nah, it's going to be
+a cold URL, sorry
+So if it's not in the
+If the URL is
+not in the cache, I think we'll want to
+put it
+put this
+into the cache
+Let me see
+So this is going to be
+URL
+And then
+I think we just want to return
+what's in the cache for this URL
+And so
+this might be
+Yeah, that's interesting
+I don't actually use set cache here
+Although there is a use case
+It's a ref as it stands
+That's what it's acting like
+Yeah
+But I think we do need it for some
+Like I think we would need this for invalidation
+It's just, in our case, we don't have
+Invalidation, so we don't have a reason
+to do this
+Because it's always, like it's caching everything forever
+But if we had
+invalidation where we want to say
+throw away the cache you had
+because something got modified
+Then we would model it as
+a set state where we
+set state to a new map
+So it would be like an empty cache
+And that's why, like, conceptually
+I think it should leave in state
+That's why it's not like a ref
+And maybe we can actually
+also show it
+We could have a small example that shows it
+Yeah
+Also, sorry that
+Sorry I just do, can we do a quick pause
+for like a bathroom break, get some more water
+Yeah, yeah, sure
+Okay, cool. I also don't have a standby screen
+So, uh, yeah
+BRB
+Okay, one second
+Alright
+Am I still on the
+stream? Like, I don't know, are people there?
+I guess
+maybe
+Um
+Yeah, I don't really have access to the
+I don't have access
+to the actual server, so I have
+I have no idea if this
+if this code works
+because I can't, for some reason I can't
+I can't
+Like, the VS Code tunneling
+doesn't work for me, I think it's
+maybe
+because of a firewall
+or something
+But maybe if, yeah, maybe for now I could
+just go over this a little bit
+So, yeah, we render
+this router that, like, renders
+this server output
+for this key
+and then, this might look a bit
+weird, because this might look, you know, like
+aren't you supposed, like, aren't components
+supposed to be pure, like, isn't this
+a mutation? And so
+the key thing here is that
+it's completely unobservable
+So
+it's, um
+because, like, the state
+the state is, like, local to this component
+and this lazily
+kind of fills it in the first time
+you ask for it, it kind of acts
+as
+you know, it is going to give you, like, the same
+result for, like
+multiple attempts, regardless of
+in, like, which order you do them
+and this is why it's okay to
+mutate in this particular
+example
+Yeah, so maybe let's see if this
+works at all, like, can we
+Did I break it?
+I don't know yet
+This should, I mean, as it looks
+it should be fine
+but if we save it, we get
+something
+Okay
+properties of undefined reading to lowercase
+Okay, so
+Something's trying to render
+that shouldn't be
+Well, wait, are we currently
+do you have question mark
+search equals blah blah in your
+URL bar? I do
+Oh, actually, no, wait, no, we're not using that
+we've hardcoded it
+Create from
+fetch fetch URL
+Yeah, it's happening server-side
+So
+it's trying to, okay
+I think it's because the dev panel
+assumes that you're fetching the same thing
+so if we just stop rendering the
+dev panel, I think it'll just go away
+Oh, no, that's, wait
+let's just fix it, it's fine
+I'll fix it
+Let's just make it so that
+the, so since the URL
+is owned by the router, I'm just
+I'm just gonna
+Yeah, I'm just gonna render dev panel here
+myself
+So we can
+put dev panel
+and I'm gonna make this URL
+a constant
+and
+I'm gonna pass it to both
+things
+so that
+I guess I don't actually know how your
+dev panel works, let me have a look
+So I'm gonna get rid of, oh, you have like
+a separate root
+It's just a separate root and separate call
+I ideally wanted it to trace
+what was happening
+Oh, I see
+And I couldn't find a way to do it, so I just
+do another fetch at the same time
+and apparently it wasn't, I did two roots
+I see, I see
+Interesting
+Yeah, right
+because you're not hooking into the same
+stream, but okay, that's fine
+so we'll do the same thing
+except it would, you know, do it with a different
+different URL
+because if I just pass the URL here
+and I also make it dependency of the
+effect
+I think it would, well I guess
+like our panel would behave maybe a bit
+weirdly
+if the URL changes
+but maybe not, so let's just see if it works
+And then can we
+where's the HTML for
+your thing, so that
+Oh yeah, that
+should be in a public folder, but I
+didn't have time for it, so I think it's inside of this
+templates index file
+I'll bring it over here
+But yeah, it's very simple
+This is all it's doing
+I can just remove it from here, right
+and make it like a regular
+Okay, yeah, so I'll just
+get rid of this
+and then I'll
+and so this is not going to be like a separate root
+it's just a React component that we're
+rendering
+Does it have any styles
+that are, that depend on that
+ID
+Uh
+I don't think so
+Oh, because you're using
+Tailwind, there's no styles
+Love it, love it
+Yep, hacks for everything
+That's the amazing thing about
+You just copy and paste things
+move them around
+Works fine
+So style files
+Okay, so let's see if
+Okay, does this work
+So if you
+try it now
+Did we fix it
+Yeah, we got no errors
+and we just get fetching from server
+which I think is right, since we're not
+rendering anything yet
+But we are, no I think we are
+rendering, like we're supposed to be
+rendering that JSX tree for that
+URL
+Oh, okay, that actually should work, huh
+So it does fetching from server
+Can you see if there are any errors in the console
+Yeah, let's see, there's no server errors
+The client console, it looks like it's just getting
+the first one, but it's not reading the rest of the
+stream onto the page
+And I remember that earlier
+we removed the function
+call and changed it to createL
+That was working
+So this is the part
+Okay, maybe let's
+go back a little bit
+and simplify it
+and then see if it still breaks
+So I'm gonna make
+a fake thing
+and I'm gonna
+instead of router, I'm gonna render this fake thing
+It's a bit hard
+for me to debug because I don't see the output
+and I don't see
+I can't actually check anything
+But maybe
+let's go back to
+like
+if I know
+my URL
+my thing
+equals
+Sorry
+I'm gonna name it in my
+weird ways
+Yeah, so I'm gonna create from fetch
+for my URL
+Oops, that's gonna be my
+URL
+And we're gonna render this
+Okay, so can we just get this thing
+working? Does it still break?
+This works
+Okay, this works
+And then
+if I swap it out with the router
+I can confirm that it doesn't
+work again
+Okay, it doesn't work
+So let's switch it back to fake thing
+It is trying to resolve the client-side
+component import though, which is interesting
+But yeah, that's working
+Okay, so let's
+maybe now change this to just
+use this
+component to see if the problem is with this
+component. Try it again
+That is not
+working
+That is not working, so that's where the problem is
+It's the cache
+Okay, that's good though because it means
+something here
+What am I doing wrong?
+Okay
+Cache, if not cache
+has cache set
+cache is
+a piece of state
+If it doesn't have this URL
+put this
+thing into it and then
+read it. Yeah, I don't see
+a mistake in the code, but maybe let's
+keep, you know, let's keep
+I mean, we can log what this is
+Yeah, let's log what this is
+But I'm not going to see the log because I don't see
+the console
+It should be the browser console, so I can at least
+bump up the font size on the screen share
+No, no, your tab share
+doesn't show me anything
+You're right
+Alright, you get chunk pending, which is a familiar
+site
+Yeah, that seems legit. Okay, no, it's fine
+I think I have a way to debug it, like I have
+a methodology. I'm just going to
+put it piece by piece and then we'll find
+where the mistake is
+Okay, so the next thing is I'm going to
+copy and paste like this
+part into the fake
+thing
+It's also doing an infinite loop, which might
+be something
+Yeah, that seems
+good to know
+if not cache, but I don't know
+why it... Yeah, because I was getting infinite
+logs
+Interesting
+Yeah, yeah, yeah, yeah
+Interesting
+Very interesting
+Yeah, well, let's
+keep going. I think I should be able to
+figure it out
+Okay, just
+Okay, so the first thing I could maybe
+try is just like
+for now, I'll move this cache
+outside maybe
+So I've had this issue in the past for
+when I tried to use use
+and I didn't put any
+wrappers around it, I didn't
+put a cache, and it was calling my
+useFetch infinitely
+because it was a weighted
+promise, and I don't know if that's why
+because this is definitely another case of returning a
+promise and passing it
+Yeah, maybe
+that is...
+Yeah, maybe actually, maybe you're right. Let me see
+Maybe that's not... Let me check
+how our
+our
+fixture does it, because maybe I'm
+just supposed to use use, and we
+don't have warnings yet, so
+that's why
+Yeah, okay, let's try this
+actually. Maybe that's how it's
+supposed to work. So I'll import
+use from React
+and let's...
+instead of fakeThing, let's render the
+router again, and let's
+get this back, except
+this will be just
+lazyJSX
+and then I'll say return
+use lazyJSX
+because I think we haven't implemented
+support for this yet, but we also haven't
+implemented good error messages
+Interesting. Let's see if that's better
+That's the same
+Now it's the same
+Yeah, we're still getting nothing
+back. Okay, now
+let's try this
+thing next. Can you
+refresh?
+Ooh, things are happening
+Okay, I don't...
+Let me look here. Okay, we do have something on the page
+Okay, so this
+works. This works
+Interesting
+So what was the important bit? Wait, what changed?
+Well, the part that changed
+is the... No longer useState
+Okay
+Yeah, I don't understand
+It definitely works like in
+the example I wrote a few days ago
+Yeah
+Oh, wait, maybe we can remove strictMode
+I mean, I wouldn't necessarily...
+I couldn't get anything
+to work without strictMode
+Oh, it works! Okay, nevermind
+Okay, if we remove strictMode
+and I put this back
+Let's see
+I think maybe we just have a bug there
+Is it still broken?
+Yeah
+Yeah, maybe it's like a different React
+version
+Yeah, I'm on an experimental
+18 release because it's the only thing that
+worked with createFromFetch
+But yeah
+Okay, let me see
+Experiment. Yeah, I don't...
+I think...
+Let's try to
+Let's try to
+use a different React version
+I will copy and paste the version that
+I think should work
+Can we
+Can we
+yarn and
+whatever
+It like upgrade to
+a new experimental release?
+No, it's actually
+different. It's like the next
+It's like a canary
+Because I don't know what's...
+Experimental might have too many things
+enabled that could be broken
+Could be
+That could be the reason
+I mean, can't we just roll without the state variable
+though? Because I feel like...
+I just want to see if that helps
+If it doesn't help, we'll just roll without it
+It's just annoying because like
+I do have this working in literally
+I know
+It's written the same way in a different project
+and I'm like, why doesn't
+it work if I have it working in another
+file
+Yeah, as a framework maintainer, whenever something goes wrong in Astra
+I'm like, no, no, no, what is it?
+What version is it?
+No, I already did
+You don't need to specify versions. I already put them in package.json
+You could just like re-run this
+Perfect
+Oh, you just found it
+Alright
+That'll do
+So these are next releases instead of experimental
+Yeah
+These are a bit more kind of stable
+Okay
+And yeah, this is where you get funny peer dependency issues
+Yeah
+And it's the same thing, I think
+Interesting
+Yeah, so it's
+Yeah, it's running infinitely
+Can we wrap this
+with the actual cache helper
+from React?
+No, we don't use that anymore
+Okay, yeah
+Okay
+Okay, let's
+Okay, let's forget about
+I mean, it doesn't matter that much because we're not doing
+invalidation anyway, so
+let's just, I'll add back the strict mode
+and I will
+Yeah, I will remove the state variable
+I'm not sure why it doesn't work
+without it, but maybe we just broke something
+So, yeah, I'll just keep it global
+But I think at least like this
+this is actually supposed to
+I don't need use here in that case
+I think
+So I think this is supposed to work
+I know, we definitely need use
+What's going on?
+Oh, we do? Okay, I can add that
+Yeah, objects, okay, it's saying promise
+is invalid
+Okay, yeah, so we
+didn't implement this yet, so let's
+Okay, let's put it back
+If anyone at home is wondering
+like what's going on, we've kind of graduated
+from exploring Rack server components
+to like how do they really work
+within a framework if you're trying
+to build one
+So this is going more in the weeds for sure
+but one interesting fact is like when you want to
+unwrap asynchronous stuff
+on the client, use is
+basically in a wait for the client, right?
+But it can also do other things
+beyond a wait
+Yeah, yeah
+Okay, so I think that
+actually should be enough for now, I don't think we need
+more fancy
+So let's just hook up the router
+to the actual routing
+Right, so let's
+Maybe you can drive this bit
+What we want to have in the router
+we have the URL
+variable, so let's make that
+initialized to
+window.location
+Let's take
+the search query from
+the actual location
+and let's make it update
+as the location updates
+Yeah, so for that
+Well, I'm wondering
+where it would go
+but first I'll just do
+window.location.
+We want it as a prop yet, let's just do search
+Do that
+and we want
+Oh boy
+I don't really want all of that
+but
+yeah, that's fine
+Clean up, I don't know yet
+but to do
+abort controller
+for create fetch
+Oh no, you don't need to do this part
+We already have this part down below
+Like all we want to do is
+Yeah, all we want to do is
+we want to have
+we want to have something that gives us
+window.location.search
+all the time
+Okay, so literally that
+Yeah, but
+Okay, so we're going to build this in later
+because right now it's not going to be reactive
+to anything, it's just going to render the initial
+cache
+Yeah, so I think maybe I can try to do
+so what does window.location.search
+return, what kind of file
+is it like a string or
+Yeah, that'll just be the string, so question mark
+Yeah, that, so it's a key that we could use
+Okay, so we do need
+this thing
+Do we need to
+encode the URI component
+or is it already encoded?
+Yeah, I think we can put this
+in the create from fetch actually
+Might make a little more sense, I don't know
+But yeah, this would be right
+Okay
+You could also just do
+window.location.pathname if that's what we're looking for
+Okay
+Or actually no, that's the query we're making
+so this is right
+Okay, let me just
+see, yeah, I think we can just
+so we don't need this, I think that's
+that's the URL we want
+to get, and I think we
+I agree, maybe this makes sense to actually
+put here, but maybe
+let's just do like a
+useEffect thing that's going to
+be
+so I think this, we're going to model
+this as like, you know, a state
+so this is the
+kind of the initial
+state, and then
+when we have a
+so I think it's
+window.addEventListener
+popState, I think
+that's the thing that
+Oh yeah
+That's the thing that's supposed
+to be
+to be doing this
+And then
+this is
+where we
+I
+don't know if
+this will
+work, but maybe it
+does, so let's
+can we
+see if this works?
+That should do it, I think
+so
+yeah, is this actually
+going to log anything?
+So this is going to re-render
+Oh, yeah, this might actually do
+a lot more, so as I
+start typing, nothing is changing
+Does it
+Let's see handlePopState
+Well, only I can see it, sadly
+But as I, okay, it's not
+doing handlePopState
+It's not calling it? Maybe I
+miss, is that wrong?
+Because I think you
+were calling the replaceState, right?
+I think you're right
+windowPopState
+I don't think it's going to
+fire
+navigateSessionHistory, right
+It changes the currentHistory
+entry to that of the last page
+of the, right, so it might
+require pushState instead of
+replaceState in order for it to work
+No, that
+doesn't sound plausible
+to me
+I think
+replaceState should trigger
+the browser
+I would think so
+Is this
+Okay, maybe
+Sorry, I'm just going to debug this
+locally in, like, Chrome
+I don't see anything that's happening
+It's very hard to do anything
+if I don't have the console
+I can do one last try
+on just sharing the browser window
+instead and see if it actually
+Yeah, let's try sharing the browser window
+Yeah
+I can do that
+shareScreen
+window
+There
+All right, and I'm going to start typing
+It is working, I think
+Oh, but then it stopped
+Okay, no, I see
+typing, okay, so
+Does it understand correctly that
+handled never runs?
+Yeah, handledPopState
+Yeah, handledPopState's never running
+HandledPopState is not
+But we do have
+We do have it
+That's so weird
+Let me just try this
+Let me try this locally
+I'll just try to do
+window.addEventListener
+popState
+with some
+log
+Sure
+listener, and then I'm going to try to
+window.history.replaceState
+with some
+Oh, yeah, that doesn't
+run it for some reason for me either
+Let me try pushState
+Maybe you were right
+No, pushState doesn't do this either
+handledPopState
+Does anyone, can you ask somebody
+who knows how
+browsers work?
+Why is this not doing anything?
+Yeah, I'm sure there's a lot of people in chat
+who know how browsers work
+I can also
+Well
+There's people I can message
+Because like the
+mdn, I'm looking at the mdn examples
+It's right here
+They show the exact same thing
+Right?
+What is different in what we're doing?
+Oh
+Oh, interesting
+Yeah, notice that the pushStates don't
+do it, but back and go will
+log
+Oh
+I forgot that's how it works
+This is so confusing
+Because this API was invented
+before client-side routing
+Yeah, so there's a new
+transitions API, which I don't know enough
+about, but that can be
+one way to try
+Let's see, I think I saw something like this
+recently
+So, replacement for history
+Yeah, that's why people use this history
+package, I think that's
+Oh yeah, that's it
+New API for
+How do I search this?
+Like, mdn
+history, API
+replacement
+I don't remember the new name
+What is the new
+Can I ask chatGP?
+Maybe it doesn't know
+We can ask
+What's the name of the spec
+that
+supersedes
+history API
+for browsers
+I've definitely read about
+Yeah
+There is, yeah, the new transition is going to
+assume a navigation is happening
+and it's going to slide in a new page
+which is actually not what we're trying to do
+viewTransitions
+No, I think viewTransitions
+has something to do with
+I think that's different
+It's about
+making it look
+nicer, right?
+It's about navigating
+It's meant to be different
+than doing a manual push
+state and changing parts of the page
+where you can say start viewTransition
+get a snapshot of what's on the page right now
+and then replace the DOM here
+It assumes DOM's being replaced
+Yes, I found it
+The new thing is called navigation API
+It's window.navigation
+Let's see if that's
+Is that different?
+Yeah
+So maybe window.navigation
+Let's see if I can
+navigation API
+blah blah blah
+navigate
+How do you
+replace?
+I actually don't see that
+navigate
+So if I go to navigate
+options
+the current state
+info
+history, replace
+Okay, you can do that
+Where is that?
+I'm looking
+through, oh yeah, it's addEventList or
+navigate, this could work
+So what you would do instead of history
+is
+inside of search
+just search
+It should be window.navigation
+Oh, I'm actually not getting
+the API
+Is it too new?
+I'm just going to try and navigate
+Yeah, it's too new, it's experimental
+Yeah, that's fine
+So yeah, we navigate to that
+and then options you can say
+not replace
+true, it's
+history, replace
+Okay
+That'll do it
+And let's try to
+listen to, what is the
+event handler on?
+Just navigate
+And it's also suggesting
+an event.intercept
+I don't know why
+I don't know what that is, let's for now
+ignore whatever that is
+Yeah, that's intercepting
+Yeah, I don't know
+because you're already intercepting if you're listening
+I guess
+So I'm going to change this to
+handleNavigate
+and let's see if that
+even gets triggered
+Can you check?
+Let's check
+All right
+Reload here
+And as we type, it's actually not
+It's not letting me type
+Let me see here
+It's not letting me
+type
+It's not letting me type
+Uh
+I just
+I wonder if it's
+re-fetching the page when I type
+it's losing the context and then it's all
+gone
+Maybe we need to disable
+some things that are happening, just to be sure
+Yeah
+Yeah, just don't do this part
+but log it
+Yeah, okay, let's do this
+Oh, now I get
+actual errors
+Navigate is not defined. What?
+Okay, okay
+This is all, like, we're going down
+the rabbit hole. Let's do it completely differently
+I'm just going to
+This is too much
+We're going to do this
+I wanted to know about the browser APIs, though
+It's a shame
+The browser API
+We're going to invent our own browser APIs
+I was thinking some custom events or something
+We can do this
+Yeah, we're just going to be
+window on
+URL changed
+That's going to be our custom
+I mean, this doesn't make any sense
+but I don't want to
+I think my patience
+is a bit
+Yeah, we're just going to have
+Yeah, that'll do. Let's do that
+That's, you know
+callbacks
+Yeah, I was going to do it a little bit more politely
+This is fine
+Yeah, we're just going to do this
+and then we're going to
+we're just going to do, like, callbacks
+push
+navigate
+and then this is going to be
+something like
+callbacks
+Yeah, just pop it off
+or slice
+Oh
+Yeah, that worked
+Maybe like this
+Can we see if that
+is called?
+Let's see
+Handled
+Yeah
+Okay, so now let's try to update
+the state as well
+Oh, it's filtering
+Is it working?
+Oh my god!
+Okay, it hides the search box
+while we're searching because we put it
+behind the wrong suspense
+but oh my god, it works
+So, wait, this is actually the part
+that we can fix
+So the issue is that
+Can you demonstrate the problem?
+Yeah
+Yeah, I can follow you
+Perfect
+Can you show the
+I guess I don't see it because the stream is not fast enough
+I don't know if people see it
+The problem is
+Let's increase the delay so that
+it's, yeah, okay
+So the search bar disappears
+because we actually need to get
+the server component output
+And the server component output is waiting
+for that filter
+or whatever
+to fetch the data before
+we can even know what to show
+and so it suspends
+And so the way
+the way you handle it
+One thing we could do
+is maybe restructure it a little bit
+so that the
+search input isn't kind of blocked
+on anything
+But the
+idiomatic solution in React is
+router changes
+Again, this is
+primarily if you're developing the framework
+I think this is something like
+if you're making a framework for
+server components, this is something
+you should probably know, is that
+the route changes
+so the set states
+that lead the route changes
+should be wrapped into transitions
+So what I'm going to do is
+I'm going to import startTransition
+from React here
+Ooh, yes
+I wanted a transition demo
+Okay
+And so I'm going to wrap the set state
+into a transition
+And so this tells React that
+actually it's okay for
+the screen to be inconsistent
+So even though we know we're fetching something
+we're waiting for something to happen
+it's okay to let that
+We don't need to immediately
+show the spinner, we can actually wait
+for that thing to be
+complete enough that
+Oh!
+I've been wanting to understand transition for so
+long and I get it
+I see the use case there
+And everything works
+Yeah, and so what should also
+work now is
+Cached ones are faster
+Yeah, so now if you type the same thing again because you've
+cached the server component
+the response is
+Ooh, yeah
+Oh, this is mind-blowing
+I love that cache was involved too
+The other thing we can try
+which I don't know if it's going to work
+because we had a bug related to this
+but I think maybe it works
+is I'm going to go to search.jsx
+and I'm also going
+to
+Yeah, so
+Okay, yeah
+Okay
+I'm also going to
+add useTransition here
+So if you only want to start a transition
+you can just start a transition
+But if you want to show visual feedback in the
+component tree itself
+when something is being refetched
+and you don't want it to be just
+like the user doesn't know what's happening
+you can
+have useTransition here
+And that gives you this
+Let's call it startTransition
+useTransition
+So that gives you this expanding Boolean
+And so what you can do is
+I know that
+You know, this is
+I'm actually going to
+I'm going to rename this
+I'll call this
+Well, okay, that's what I'm going to do
+I'm going to call this window.router.navigate
+to here
+And I'll just
+That's supposed to be
+your framework
+I mean, you wouldn't put it on the window variable, of course
+But it would be like
+Yeah, but that's
+We're going to go back to the root.client
+And I'll just
+This is going to be our toy router that has
+navigate the URL
+And so this is the part that actually does
+the
+This is the URL
+It does the state and then
+It calls
+the callbacks we registered
+So I
+think
+window.router.navigate
+replace state URL
+Okay
+Yeah, and so this is
+Say again
+We're hitting a client error
+What is the error?
+The user, no, no, not that
+Callbacks is not defined. Okay
+It's just a
+Yeah, it's just a typo
+I think I deleted it accidentally
+Yeah, we just deleted it
+Okay, let's try again
+Okay, that's working
+Yeah, so now let's go back to the search
+And let's say
+Oh, and look at this
+We can actually see all the requests coming down the wire too
+It's going to
+keep doing this
+So let's add a little bit
+Yeah, that's a new
+Can I add this back?
+This is going to look a little bit ugly
+But I'm just going to add like a
+Also like if is pending
+Then I'm going to
+add like a little
+You know, like a little
+I don't know
+Margin left
+Two or something
+I don't remember how to do it
+Sure
+But let's see
+Yeah
+Yeah, I think italics are what we want here
+That should work
+So can we see
+if that does anything?
+It looks like it is
+Yeah, we get a little
+We get a little loading
+flash
+But if we do something
+and it's cached
+It's pretty much instant
+It shows a little flash of it
+while it fetches from the cache
+Yeah
+So the way you deal with like
+So what we kind of want to do here
+is like we want to show
+You see like
+this you are looking for
+So this is the
+example that we have
+It doesn't quite make sense
+Well
+So this is the thing that will be updated later
+Because like we need to go to the server
+And like that part is like on the server
+And we could have moved that to the client
+And like show it in the search box instead
+So I think it just depends on like
+What kind of UI do you want?
+Like do you want
+You know
+Like other patterns could be
+Like grayed out
+While the
+While you're refetching it
+So that's another
+kind of common pattern
+Yeah
+Maybe do you want to
+try to do that?
+Sure, yeah
+Could be fun
+It's a little bit
+It's a little bit trickier
+to figure out how to do this
+Yeah, okay, I'll be honest
+I was reading something from chat and missed the last 20 seconds
+of what you said. Can you say that again?
+Yeah, I was saying
+Now like we
+We can kind of
+I don't know
+Maybe we should go through the code
+And just kind of recap
+Because like we have a solution now
+So it seems like a good time
+Like we built a tiny framework
+That does a little bit of routing
+In a way that
+Works with server components
+So maybe it's a good time to recap
+What's going on in our
+setup. Do you want to try to do that?
+Let's do it
+Yeah, so I
+Will try to trace it from the top
+But basically what we built
+Is a
+Search box
+That's able to have just a little bit
+Of client-side JavaScript in order to
+Store a state
+Of what you're trying to search for
+And then anytime you put in an input
+We're updating the URL bar up here
+At the top
+And anytime that you update the URL
+We want to re-render
+The parts of the page that depends on that URL
+Here the part that depends is
+The amount of albums that we're showing
+So when we say search post, we want to
+Go to the server, figure out which albums
+Actually have the word post in them
+And then send that new result
+Down to the client
+Without actually having to render all of those albums
+With client-side JavaScript
+So if we head over to our root
+Client where we're doing this
+Slight hack, but you could formalize
+This into a framework as Dan mentioned
+In here
+The client is able to trigger
+Navigate, or any client component
+Is able to trigger a navigate command
+Which will tell it the URL
+It wants to go to, we're going to use
+The web standard history API to update
+That state, and then pass in
+A callback here that's going
+To trigger
+Actual navigation events
+So we mentioned it a little bit earlier
+But we had a, now I'm actually
+Losing where it is, but yeah
+Way down here is where we're actually going to
+Fetch the server component and render it
+Onto the page
+But up here we're using an effect
+To say anytime that you
+Navigate on the page, first off we're going to
+Start a transition, which
+I'm still wrapping my head around a little bit
+But it's basically saying, keep the DOM
+That you already have
+Until all the other async stuff has resolved
+And then replace it
+Once all of that is settled, is that kind of what it's doing?
+It's, yeah, I would maybe
+And again, just to clarify
+This file we're looking at, that's not
+That is the part that's the framework part
+This is the framework part
+It's not the part that you're
+You don't need any effects here
+As a server components user or something like this
+So this is like the framework router part
+Really
+Actually I just realized that we made one
+Omission, which is, I think we still need
+To handle pop state
+Because we want the back button to work, right?
+So we want the back button to also
+Update the
+So I think that should
+That should give us the
+Well, I guess we don't, we replaced
+State, so it's, you're not going to see it
+Yeah, you're not going to see it
+But yeah, this is another thing
+That frameworks deal with, where if you
+Don't want to have like a full page refresh
+Every time, because if you did this fully server
+Side, we could anytime
+You type in the input, send a form request
+Refresh the page
+And send that new stuff down
+But here we want to say, don't refresh the whole page
+Keep it where it is, we're going to
+Handle those changes to the URL
+Bar ourselves, and we're going to
+Make sure like, when you do all your web standard
+Back buttons, they still work
+And when you actually navigate
+We don't want to blow away the app
+And re-render it top to bottom, we want to keep it where it is
+And trigger anyone that
+Cares about the transition to also
+Show little loading states
+Yeah, so just to clarify
+The start transition stuff here
+It doesn't prevent
+It doesn't have anything to do with
+Reloading the page completely
+Because React wouldn't reload the page
+We're just set in state
+There's no reason to reload the page
+What happens here
+Is it just prevents
+React from hiding content
+That was already visible
+Like if you're interacting with
+A search input, you don't want that
+Input to get hidden, because
+We're waiting
+Our new state is this response
+From the server that's still streaming in
+So start transition just says
+This state update is not urgent
+You don't have to
+React doesn't have to
+React can wait
+Until we have something
+Meaningful to show
+So in reality what that means
+Is it wouldn't wait
+It will wait long enough
+Not so that
+It doesn't have to hide any existing content
+But for example
+If your server response
+Includes some new suspense boundary
+With a bunch of stuff inside
+It's not going to wait for that
+Because there's no reason to
+But start transition
+Is this opt-in
+This is not urgent
+So you don't have to hide a bunch of stuff
+While we're waiting
+Keep things as they are
+And then we can keep track of them
+Inline in the search component
+It has an inline indicator
+That it's parent
+Is actually refetching
+But yeah
+This is kind of what it is
+That's what happens inside the framework
+But if we forget this file exists
+And we just approach it from
+I think it's helpful to describe it
+From the server components
+Point of view
+As a user you don't even have this root client.js file
+It's somewhere in the framework
+But as a user where do you start
+Where does the story start
+For a user
+Gotcha
+Because that's the boundary that we set
+With suspense
+Anytime you
+Well we can't see it anymore
+But it used to
+It'll sort of show that fallback
+And then show the whole result
+But what we've done is we've put the search box
+Alongside the stuff that's loading
+So in order to make sure all of
+The stuff you're looking at in the search box itself
+Aren't as you mentioned
+Removed from the page
+Or changed in some way
+Transition is the way to do that
+And I'm assuming
+Use transition is a pretty global thing
+So when you start transition
+Is it based on parents
+Where if a parent starts a transition
+The child picks it up here
+No
+It's really about the state updates
+It's like whatever you
+Whichever set state calls happen
+Inside of a strategic goal
+They are kind of marked as
+This stuff is not urgent
+And react will display the output
+When the stuff is ready
+But what I meant more
+I think if we ignore all this wiring
+And we focus on how you approach it as a user
+The entry point
+Is really root.server.js
+That's where the story starts
+From the user perspective
+And so you kind of just see it as
+You have a root component
+Like in this case server root
+That accepts the search
+And it doesn't matter if it's the first time it loads
+Or if it's like a refresh
+The way you think about it is the same
+It's like you got a response
+You got a request
+You're going to re-render the tree
+And so you think about it as
+I received some search query
+I'm going to pass it to albums
+Albums passes it to
+This searchable album list
+Which also runs on the server
+This is where we
+Actually do the filtering
+And then we render the search box
+And the list of albums
+And so the search box
+Is kind of
+This is where
+This is where this other side
+Of the flow triggers
+Where it's like when I tap into the search
+I want to navigate
+As a user
+I just want to navigate here
+And then that's
+The whole story
+Because now it's the server
+Like we're again in the server
+In root.server.js
+And we just kind of render again
+Using the new search value
+So you don't really
+Think of it as state management
+Right
+In fact we could even
+Just for fun we could even delete
+The state here
+I believe we could get rid of the
+State completely
+And this could just be uncontrolled input
+That has default value
+Equals initial search
+And it has this onChangeHandler
+That just does the navigation
+Doesn't do anything else
+And I think it should still work
+It actually does
+Yeah so there's like no state management
+Here
+There's no managing caches yourself
+Or you just want to change some data
+You just
+Re-render the page
+But then it doesn't recreate the DOM
+It doesn't recreate the DOM
+Yeah
+And the boundary that was like
+If you don't have a transition
+It will use the suspense fallback
+So one thing I'm wondering
+Inside of root server
+If we remove the suspense wrapper
+What will happen?
+Do we need transition anymore?
+Let's try
+I don't know
+I think maybe it would
+Work without a transition
+I think
+But it's
+Well
+I guess it depends on where you want
+To remove the transition
+They're nested
+Just to be able to show the
+IsPending
+Because the routers should always
+Navigate in transitions
+But we can also wrap it in extra time
+To get this
+Is it happening
+For feedback
+Yeah
+And so how does it know when
+IsPending is done?
+Is that when everything down the parent
+Chain of components is now rendered?
+Not quite
+It's
+I think conceptually
+The way it's implemented
+There are different ways to do it
+But I think conceptually you can imagine it
+As
+It kind of spawns
+A new parallel universe
+Where the state is
+If we go to
+root.client.js
+And you see that
+It does this set URL
+Call
+Traditionally this would mean
+The state changed
+Get the new thing on the screen
+Immediately
+If we get rid of startTransition
+In both places
+We would see traditional re-rendering
+Behavior where
+It's kind of
+We changed this, now it has to update
+To reflect what's in the state
+We don't have the
+JSX tree for what's in the state
+That's why it's showing
+The closest suspense spinner
+Which
+You would need to add
+And the analogy that I like to use
+For this is git
+So if you work on main
+If you only work on main
+And then
+You
+Make a change that
+You start refactoring something
+And you change
+One file
+And
+It's not done until you finish refactoring
+Your project is kind of
+In the loading state
+It's not ready
+And the users would see
+Imagine you refactored in production
+Your users would see
+That you're doing it
+And that's why we don't do it this way
+We start a branch, we work in a branch
+And then we think
+This is enough to ship
+To the main branch
+And so transitions are kind of the same concept
+It's like branches
+It's like you're telling React
+Here's a set state I want you to do
+But actually start
+Working on it
+In background
+Start preparing it
+You can almost imagine
+You had two screens
+And one screen was what the user sees
+And the other screen
+Is background stuff
+And on the screen
+With the background stuff
+You would see a big loading indicator
+Because nothing is ready yet
+And then it would kind of gradually refine
+To get
+With the server data
+And at some point you have enough server data
+That you don't
+You wouldn't need to hide anything to show it
+You wouldn't need to hide any
+Existing content
+So this is where React commits the transition
+So React is like
+We have enough of the tree
+That we wouldn't need to hide anything
+Nothing would
+Disappear under you
+It's automatic
+You don't think about this as a user
+But that's the heuristic we use
+We're going to show you
+The output as soon as we have enough
+That
+It doesn't feel disruptive
+Because nothing disappears
+From under you
+Right
+So React commits transitions off
+To decide what if I delete it here
+What if I remove it here
+What if we remove the suspense boundary
+And I think it will still take some time
+To really feel it out
+Because I'm sure you use it
+In a lot of different contexts
+But for the search box it makes sense to me
+Where you definitely want to start transition here
+Because we want
+To be able to track
+Like okay this
+We've started something
+We don't know when it's done
+All we want to do is show that it is pending
+And then as soon as React
+Has figured out
+Everything
+It's resolved all the components down the tree
+I'm trying to find the perfect vocabulary here
+And I don't think I have it yet
+I wouldn't say
+It doesn't need to resolve everything
+Because maybe you have some new components
+And there's no reason to wait for them
+So as soon as you have enough
+That would be not embarrassing
+To show
+That's kind of how I explain it
+As soon as you have a decent
+Floating state
+And it's determined automatically
+So you don't need to think about it
+Yeah
+It's contextual
+We know you called this from the search box
+So we know what this search box
+Depends on
+The parents that it has in order to render that search box again
+No
+That's not how it works
+It's not conceptual
+I think that's kind of the cool thing
+About this
+It really doesn't care
+Because you could be navigating to another page
+You could be navigating
+From a feed page
+To a profile page
+And then let's say on the profile page
+You have profile cover
+And then you have
+Profile timeline inside of suspense
+So what that means
+And then
+My start transition is built into the router
+So it's not
+Just for this search box
+Like here
+We could completely remove start transition
+Like we just want to show a state
+Tracking what's going on
+Yeah so here it's not essential
+Because we only added it here
+To get this access to this is pending
+Where it's important
+Is only at the router level
+And so what this does
+What this does
+Here for example
+If we're moving from feed to profile
+And then profile has like a cover
+And a timeline
+Wrapped in suspense
+What's going to happen is that
+If profile cover needs to load some data
+For example profile name
+And your avatar
+Then the router will wait
+For that to be ready
+It won't teleport you to this empty profile page
+That doesn't have anything
+Because we don't have a decent loading state
+For it
+We don't have something to show yet
+But then as soon as
+The profile cover is ready
+And the remaining stuff is wrapped in suspense
+It will be like
+Now I can actually move to this page
+Because I can show the cover
+And then the rest will have a spinner
+So this is what it does
+It just opts you into this
+It doesn't have to happen right away
+But we're going to wait enough
+Until we have something decent to show
+And it's based on this heuristic
+So it doesn't really care
+From which component
+Because like you see here
+It's really at the root level
+So it doesn't even know
+You're calling it from search input
+It doesn't care where you're calling it from
+Yeah
+I guess in the other example I was trying to figure out
+When is pending resolved
+And it sounds like there's more heuristics involved
+Than just like
+Everything down the tree has re-rendered
+There's a lot more to it
+Well it's not a lot more
+It's a very simple heuristic
+But it's very non-intuitive
+Because we only figured it out
+In the initial design
+It didn't work like this
+And this is the most natural
+It's a bit weird
+Because understanding the heuristic
+Is pretty difficult
+But then the way it works is very natural
+So you don't have to think about it
+You don't need to know about it as a user
+If you're curious
+As a framework author
+How it works
+Then it's really
+Can we
+Every time
+We're about to
+We got some new data
+We could maybe make some progress
+On rendering the tree
+And then every time
+We're like okay
+For now it seems like we're done
+We've done everything we could
+And we make a decision
+Is this enough to
+Show this to the user now
+Or do we have to keep waiting longer
+And the way we make the
+Decision is pretty simple
+It's if we
+Have rendered it now
+Would we have to hide any
+Existing content
+So this moment
+Where the search bar disappeared
+Because something there was not ready
+And there was a suspense boundary above
+It kind of means we're
+Resuspending it
+It wasn't here
+But it has to disappear
+Because some part of the tree is not ready
+And so if we have to do this
+We're not going to commit it
+No, let's keep waiting a bit longer
+But
+If we have enough of the tree
+That we don't need to hide any
+Existing content
+It's just maybe we have some new content
+That's not fully fetched yet
+We would be like, yeah, sure, let's go ahead
+Let's show it
+I think I'm getting it then
+It's definitely based on what you have now
+And what you're trying to get
+And if
+You have enough of a match
+In what you're trying to get that you're not going to hide anything
+Then we'll go ahead and resolve it
+Exactly
+That's how it works
+It's a very simple thing
+But it's hard to wrap your mind around it
+But I find it
+Kind of fascinating
+Because it is a solution
+To the
+If you ever developed a router
+In traditional kind of JavaScript
+Ecosystem
+There were always
+You always had to make
+This tradeoff between
+How do I know
+When to show the route
+During navigation
+And different routers solve this
+Differently
+So
+In some routers
+I think maybe Ember router
+I'm not sure
+But in some routers
+They wait for all data
+For the new route to be ready
+And then they transition you
+To the new route
+And so the benefit of this is that the user
+Doesn't see this immediate
+Big spinner
+That's like, you're pressing a link
+And you have nothing to show yet
+And you have to wait for everything to load
+Which could be slow
+So ideally
+You wouldn't have to
+And then the other extreme
+Which I think most React solutions
+At least for some time
+It depends on how we configure it
+But at least it was very common
+That routing happens immediately
+So you press a link
+You immediately re-render
+Like you rendered a new page
+But maybe it's not ready
+And so I think the beautiful thing
+About this paradigm
+Is that it lets you draw
+The boundary exactly where you want
+Just by placing suspense
+Around it
+Because the router
+Uses transitions by default
+So you don't have to
+By default everything is sticky
+So until everything is ready
+It doesn't do it
+But then suspense lets you say
+No, actually this part of the tree
+That's okay to wait a little bit
+It doesn't have to wait for it
+So it's kind of like inverse await
+Where you say
+This part, it's independent
+I wrap it in a loading state
+Now transitions won't wait for it anymore
+And I think that's maybe
+A natural way to explain it
+It's like by default
+Everything is sticky
+And suspense is what unsticks it
+Yeah
+That's a wild way to think about it
+Because there wasn't really
+A convention for this before
+You were just going to grab whatever the tree is
+And plop it on the page
+You can't use heuristics to know
+What was there before in the new thing
+It's not really like diffing
+But it is figuring out
+You don't really want to suspend again
+We don't want to keep suspending every time we type in the search box
+We've suspended before
+And we don't want the user to see it
+So if we do a start transition
+We can still get the new state
+Or the new text inside the search box
+But we're going to avoid
+Blowing it away while we're doing it
+Yep
+Very cool
+Okay, I'll also admit that I'm like
+I'm running on fumes
+I had breakfast like eight hours ago
+At this point
+I didn't think we would go this long
+I definitely thought we were going to go for like two hours
+Maybe two hours thirty
+You've been super generous with your time
+But I'm going to push this up
+To make a separate branch
+Just in case people want to see
+Co-authored by Danny Ramone
+Absolutely
+We'll call it, oh boy, Router Toy
+It's what I kind of liked
+RSC Demo also
+RSC Stream Demo
+If anyone's wondering what the Twitch Stream Demo had
+Yeah, we'll do that
+And if anyone wants to play with this
+I'm tired from just following along
+Man, thanks for sticking through here
+In the chat, thank you
+But I shared it just above
+If anyone wants to play with this
+Toy implementation of React Server
+Components, we never actually got to look
+At a framework, we built our own
+But this is simple RSC
+It doesn't even have a readme at the moment
+I was very undergun trying to get it in
+For the stream today
+So I'll try to add some docs
+And maybe explain the dev panel a little bit more
+But the goal is to not add
+Any more features to this
+Maybe delete the files that we don't use
+So that, like, I think you have
+A bunch of files that we didn't end up using
+Yeah, I think the Bjork album's gone
+The like button was never pulled in
+Counter was never pulled in
+That should be it
+And I'll double check on this
+In case it was floating around somewhere
+Yeah, it still is
+Maybe let's rename root.server.js
+To something like
+Server root, and then
+The root.client.js to something like
+Router, or I don't know
+Ideally we would
+Maybe make a
+I'd like to see some separation so that it's clear
+This is the framework part, this is not the part
+You're supposed to be writing
+No, exactly
+Yeah, I definitely prefer to
+Oh, did we actually get an index file?
+Where did this come from?
+I think this is just like an old thing
+Yeah, this is not being used
+I wanted to call it
+We decided on index and bootstrapping
+As like loose names
+I don't mind it
+But index feels right for that
+Because that's like the index route
+And this is just
+Yeah, there's a few ways to put this one
+Maybe not the index
+Maybe like page
+Or something
+Oh, page is good
+Next.js style
+This can be
+Route handler
+Well, it does a lot of things
+It mounts it onto the page
+Yeah
+Client
+I think
+Can we move it
+Out of the source directory
+And put it
+Closer to the handler
+I think conceptually
+It's related to this handler.js
+In a way
+It's like the client part of it
+I hear what you're saying
+Or maybe you could move to source
+Like make a directory called framework
+And then there would be
+Like server.js
+And client.js
+Yeah
+Router.server.js
+I don't know
+I went back and forth so long
+I landed on the remix names
+And I still don't like them
+So
+I just think it's important to
+Make sure that people don't think that this is the stuff
+You're supposed to be writing
+The actual application code is just
+Page.js
+Search.js and searchablealbum.js
+Yeah
+We could call it
+Underscore internals
+Yeah
+Bubble it up
+The only thing left to do is to
+Track down a couple hard-coded things
+I think I was pretty
+I wasn't great about this
+So that would be page now
+I'm hoping
+Also this is not the client part anymore
+Yeah
+Wherever we did root.client
+We did that
+Okay
+Yeah
+Oh so let's rename search to
+Searchbox because that's how you named it
+Oh yeah I noticed
+We were a little inconsistent
+Okay I renamed it
+Okay
+And I'll move
+The filter albums function down
+So that it doesn't obscure the
+Component
+Build successfully
+I think everything works
+What?
+Awesome
+That's searchbox
+That's that
+This index file is just not a thing
+I don't know why it keeps coming back actually
+Why does it keep coming back
+Nice
+Maybe stick it in support
+I hear you
+I don't know about that
+I don't know
+Yeah I think internals is still
+Where I'm sitting
+I've also seen engine as a convention
+But that's a little more
+We can also call it
+Yeah
+That's fine
+It does kind of indicate you can have
+Multiple routes but
+It is a router
+It's like toy router
+Toy router
+Yeah I mean the whole thing's
+A toy so I'm not going to call it that
+Yeah that's good
+Yeah that'll
+Work fine
+Okay
+I'm feeling good about these names
+And the only squiggles we have should just be
+Yeah we're abusing window
+And async
+Is not part of like the
+Built in TypeScript JSX thing
+It's kind of funny that JSX has been hijacked
+As like this standard that can be highlighted
+The same way for everyone
+Because you can use it different ways
+And you end up with funky situations like this
+Where some people support promises
+And some people don't
+But it's still JSX
+Yeah
+Why does it keep showing client part
+I think I deleted this comment before
+Yeah
+Sometimes LiveShare
+Gets out of sync
+And luckily we've been pretty in sync this whole time
+Perfactor
+New naming
+All right
+That's up
+Beautiful
+Beautiful
+Yeah
+Well I'll go back to our big faces I think
+Your lighting's gone down a bit
+I have some more time
+But yeah let me
+Make sure of the branch
+Before we sign off
+Okay my computer's chugging
+Y'all can find the branch don't worry about it
+But hey if you enjoyed the stream
+I try to do Twitch streams
+Every week
+Thursdays at
+What is it now
+It should be 3pm eastern
+But we bumped it forward a little bit
+For this special edition stream
+But I've been doing React server components a lot
+I've been going really deep on it
+Because I'm also someone who works on Astro
+Which is a meta framework
+It would be cool to support some implementation
+Of server components if not for the migration story
+So I'm going to be playing with it a lot more
+And yeah
+Drop a follow if that interests you
+You can also of course follow Dan
+If you're not I don't know why
+But he's around Twitter
+Dan underscore Abramov
+You can see the title of this stream
+I think that is the Twitter handle
+Is there anyone else
+That you want people to find you
+Or any closing thoughts
+I don't think I want people to find me
+All right
+Enough of them have found me
+I just want to say I really appreciate you
+Offering
+For me to be on this stream
+And also
+You really did the homework
+I mean the only reason
+We were even able to
+Build a mini framework
+Is because you've already built 80% of it
+So I really appreciate
+Doing the homework
+So well
+It's really impressive
+And there aren't
+There isn't that much documentation around it
+But yeah
+Thank you so much for
+Creating this opportunity
+It was really fun
+Yeah
+I mean thanks for just saying yes
+On a random Twitter DM
+I wasn't sure
+But I thought like
+Because I saw the stream you did with
+Ken C Dodds and others
+And it was like this stream was great
+And I was like
+Can we actually
+Draw a flow diagram
+And see some code
+Because conceptually
+There's a lot going on
+So yeah
+I think this went over really well
+And the replay will be on YouTube also
+I'll share the link in the chat again
+But I'll try to upload this live stream over there
+It might go up by tomorrow
+Because downloading four hours of stream from Twitch
+And uploading four hours of stream to YouTube
+It might be a little bit
+To see if we can get like
+The let's build a router part
+Separate from the let's understand server components
+Because one's more intermediate and advanced
+Than the other
+But yeah
+Okay
+Yeah well good having you
+Thanks for stopping in
+And oh
+Let's actually find someone to raid
+Before I hop off
+Does anyone have suggestions
+What does it mean
+What is raiding
+I don't understand
+It's something you can do on Twitch
+To take your audience and push them
+Into another stream that's active
+Oh
+Are they like forced
+To do that
+Well I mean you can just stop watching
+If you don't want to do that
+It's kind of like YouTube autoplay
+Yeah
+But it hosts inside of yours
+And you can leave
+It's I don't know it's a fun system
+But I'll raid Cassidy
+Because she's great and does a ton of React tutorials
+And everything
+We still had a ton of people sticking around
+Thank y'all so much
+Drop a follow for the next stream
+Obviously do all of that
+But yeah
+See y'all around
+Bye
+Okay
